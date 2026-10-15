@@ -41,9 +41,11 @@ elab "expect_export_error " invocation:tactic : tactic => do
 
 -- Function objects remain unsupported when their checked encoding is disabled.
 -- Check required goals and explicit hints separately, without a direct proof
--- bypassing the export path.
+-- bypassing the export path or parallel native HO search proving the goal.
 private opaque acceptsFunction : (Nat → Nat) → Prop
 
+set_option vampire.parallel false in
+set_option vampire.routedSlices false in
 set_option vampire.higherOrderEncoding false in
 set_option vampire.directProof false in
 example (f : Nat → Nat) (h : acceptsFunction f) : acceptsFunction f := by

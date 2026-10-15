@@ -3,6 +3,7 @@ import VampireHammer.Export.DirectProof
 import VampireHammer.GoalDecomposition
 import VampireHammer.EmptyDomains
 import VampireHammer.UserMessages
+import VampireHammer.ProofCache
 
 /-!
 The `vampire` and `vampire_export` tactics and their tactic-state boundary.
@@ -430,6 +431,29 @@ private def decomposesGoal (hints : TSyntax ``Auto.hints) : TacticM Bool := do
 
 private def captureGoal (hints : TSyntax ``Auto.hints) (uords : Array (TSyntax `Auto.uord)) :
     TacticM Unit := do
+  if vampire.parallel.get (← getOptions) then
+    let tacticContext ← read
+    let tacticState ← get
+    let termContext ← readThe Term.Context
+    let termState ← getThe Term.State
+    let main : TacticM Unit := do
+      let budget ← IO.mkRef (vampire.timeLimit.get (← getOptions) * 1000)
+      withFoldedDefinitions (← premiseConclusions hints) <|
+        withDeferredWitness (replayGoal hints uords (some budget)) budget
+    let split : TacticM Unit := do
+      let budget ← IO.mkRef (vampire.timeLimit.get (← getOptions) * 1000)
+      let destination := vampire.outputPath.get (← getOptions)
+      withOptions (fun options => options.set `vampire.outputPath
+          (if destination.isEmpty then "" else destination ++ ".split")) do
+        unless ← tryDecomposedGoal hints uords budget do
+          throwError "Parallel goal decomposition did not close the goal"
+    let actions := if ← decomposesGoal hints then #[main, split] else #[main]
+    let workers := actions.map fun action =>
+      ((action tacticContext).run tacticState).run termContext termState
+    let ((_, tacticState), termState) ← raceMeta workers
+    set tacticState
+    set termState
+    return
   let budget ← IO.mkRef (vampire.timeLimit.get (← getOptions) * 1000)
   let monoDecomposed ← IO.mkRef false
   let run : TacticM Unit :=
@@ -539,7 +563,7 @@ private def validateOptions : TacticM Unit := do
   if vampire.sliceHoFirst.get options + vampire.sliceFo.get options > 100 then
     throwError "`vampire.sliceHoFirst` and `vampire.sliceFo` must total at most 100%."
   if vampire.timeLimit.get options == 0 then
-    if vampire.routedSlices.get options then
+    if vampire.routedSlices.get options && !vampire.parallel.get options then
       throwError "`vampire.routedSlices` needs a positive timeout; use `(timeout := 10)`. For unlimited search, also set `(routedSlices := false)`."
 
 /-- Children of `vampire`/`vampire_export`: settings, facts, settings. The
@@ -553,7 +577,7 @@ private def callParts (stx : Syntax) :
   let (settings, hints) := callParts stx
   withSettings settings fun uords => do
     validateOptions
-    UserMessages.withFailureHint (captureGoal hints uords)
+    UserMessages.withFailureHint <| ProofCache.withCache hints uords (captureGoal hints uords)
     unless vampire.quiet.get (← getOptions) do
       logInfo "vampire closed the goal."
 
@@ -568,7 +592,7 @@ elab_rules : tactic
     match strategy with
     | some strategy =>
       withOptions (fun opts => opts.set `vampire.strategy strategy.getString) do
-        captureGoal hints uords
-    | none => captureGoal hints uords
+        ProofCache.withCache hints uords (captureGoal hints uords)
+    | none => ProofCache.withCache hints uords (captureGoal hints uords)
 
 end VampireHammer

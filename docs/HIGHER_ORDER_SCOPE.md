@@ -1,13 +1,13 @@
 # Higher-order support
 
 Native higher-order export uses simply typed THF for functions, propositions,
-curried application and typed lambdas. The default routed schedule tries
-higher-order search before first-order search.
+curried application and typed lambdas. By default, native higher-order and
+checked first-order search run concurrently after shared monomorphization.
 
 To select a single route:
 
 ```lean
-vampire (routedSlices := false) (higherOrder := true) [*]
+vampire (parallel := false) (routedSlices := false) (higherOrder := true) [*]
 ```
 
 Set `higherOrderFallback := true` to allow a first-order retry after a failed

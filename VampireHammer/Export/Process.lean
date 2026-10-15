@@ -79,6 +79,7 @@ private def vampireArguments (opts : Options) (timeLimitMs? : Option Nat := none
   let strategyArgs := if strategy.isEmpty then #[] else #["--decode", strategy]
   let higherOrder := vampire.higherOrder.get opts
   let mode := if !higherOrder && strategy.isEmpty && vampire.use_portfolio.get opts then "portfolio" else "vampire"
+  let cores := if mode == "portfolio" then vampire.portfolioCores.get opts else 1
   -- `tptp_ac` retains associativity and commutativity steps needed for replay.
   -- AVATAR follows the scheduled strategy unless explicitly disabled.
   let avatarArgs := if higherOrder || vampire.disableAvatar.get opts then #["--avatar", "off"] else #[]
@@ -108,7 +109,7 @@ private def vampireArguments (opts : Options) (timeLimitMs? : Option Nat := none
   -- Vampire's standard dependency minimization can instead produce a smaller
   -- function that our current witness construction cannot supply.
   return strategyArgs ++
-    #["--mode", mode, "--cores", "1", "--shuffle_input", "off",
+    #["--mode", mode, "--cores", toString cores, "--shuffle_input", "off",
       "--shuffle_on_schedule_repeats", "off", "--forced_options", forcedOptions,
       "-p", "tptp_ac", "--replay", "on", "--skolemization", "syntactic",
       "--newcnf", "off",

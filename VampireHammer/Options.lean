@@ -8,8 +8,13 @@ configuration interface.
 open Lean
 
 register_option vampire.quiet : Bool := {
-  defValue := false
+  defValue := true
   descr := "Suppress the success message after vampire closes the goal (errors are still reported)"
+}
+
+register_option vampire.cache : Bool := {
+  defValue := true
+  descr := "Reuse completed kernel-checked Lean proofs from a bounded in-memory cache in this Lean process"
 }
 
 /-- Script used only by `vampire_export`. It receives the generated TPTP text
@@ -42,10 +47,20 @@ register_option vampire.strategy : String := {
   descr := "Encoded strategy passed to Vampire with `--decode`"
 }
 
-/-- Use a single-worker portfolio when no encoded strategy is supplied. -/
+/-- Use a portfolio when no encoded strategy is supplied. -/
 register_option vampire.use_portfolio : Bool := {
   defValue := true
   descr := "Use Vampire portfolio mode when vampire.strategy is empty"
+}
+
+register_option vampire.portfolioCores : Nat := {
+  defValue := 1
+  descr := "Number of Vampire portfolio workers (0 uses all available cores); applies when use_portfolio is true and strategy is empty"
+}
+
+register_option vampire.parallel : Bool := {
+  defValue := true
+  descr := "Race native HO and checked FO search after shared monomorphization, and concurrently try goal decomposition when enabled; overrides routedSlices"
 }
 
 /-- Collect algebraic laws from `Std` law instances for the binary operations
@@ -58,7 +73,7 @@ register_option vampire.lawInstances : Bool := {
 /-- Maximum number of seconds Vampire may spend searching for a proof. -/
 register_option vampire.timeLimit : Nat := {
   defValue := 10
-  descr := "Shared external proof-search budget in seconds (0 means unlimited; routedSlices requires a positive budget)"
+  descr := "External proof-search allowance in seconds, per attempt in parallel mode and shared in sequential mode (0 means unlimited; sequential routedSlices requires a positive budget)"
 }
 
 /-- Most failed hammer problems are satisfiable abstractions on which saturation
@@ -104,10 +119,10 @@ register_option vampire.deferInhabitants : Bool := {
 }
 
 /-- Representation of the single-route search and export-only tactic.
-The default routed slices select their own FO/HO representations. -/
+Parallel search and routed slices select their own FO/HO representations. -/
 register_option vampire.higherOrder : Bool := {
   defValue := false
-  descr := "When routedSlices is disabled, select native higher-order THF (true) or first-order TFF (false); also controls export-only calls"
+  descr := "When parallel and routedSlices are disabled, select native higher-order THF (true) or first-order TFF (false); also controls export-only calls"
 }
 
 /-- Keep the checked first-order route available when native higher-order
@@ -162,7 +177,8 @@ initialize registerTraceClass `vampire
 
 end VampireHammer
 
-/-- Main time-sliced search over a shared FO/HO preparation. -/
+/-- Sequential time-sliced search over a shared FO/HO preparation, used when
+parallel search is disabled. -/
 register_option vampire.routedSlices : Bool := {
   defValue := true
   descr := "Time-sliced HO -> FO -> HO schedule over one shared monomorphization: native HO searches its share first, FO then searches its share plus any time HO left unspent, and HO searches again with the alternate strategy only if FO ended early (finite model, GaveUp or another failure, not a timeout) and HO had been prepared (requires a finite timeLimit; ignores monoHeartbeats)"

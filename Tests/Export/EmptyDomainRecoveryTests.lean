@@ -1,6 +1,9 @@
 import VampireHammer
 import VampireHammer.EmptyDomains
 
+-- Keep the route-specific protocol deterministic under the parallel default.
+set_option vampire.parallel false
+
 open Lean Meta Elab Tactic
 
 set_option vampire.higherOrder true

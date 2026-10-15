@@ -1,5 +1,8 @@
 import VampireHammer
 
+-- Keep the route-specific protocol deterministic under the parallel default.
+set_option vampire.parallel false
+
 set_option vampire.higherOrder true
 set_option vampire.higherOrderFallback false
 set_option vampire.directProof false

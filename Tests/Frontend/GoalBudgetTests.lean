@@ -1,5 +1,8 @@
 import VampireHammer
 
+-- Keep the route-specific protocol deterministic under the parallel default.
+set_option vampire.parallel false
+
 -- Exercise the single-route protocol independently of the default sliced search.
 set_option vampire.routedSlices false
 

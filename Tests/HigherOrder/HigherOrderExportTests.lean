@@ -1,5 +1,8 @@
 import VampireHammer
 
+-- Keep the route-specific protocol deterministic under the parallel default.
+set_option vampire.parallel false
+
 set_option vampire.higherOrder true
 set_option vampire.attributeLemmas false
 set_option vampire.outputPath "artifacts/higher-order-export.p"

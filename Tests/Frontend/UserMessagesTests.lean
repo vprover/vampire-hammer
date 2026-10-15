@@ -6,17 +6,19 @@ open Lean Meta Elab Tactic
 run_cmd do
   let options : Options := {}
   unless vampire.timeLimit.get options == 10 && vampire.routedSlices.get options &&
-      !vampire.higherOrderFallback.get options && !vampire.quiet.get options do
+      !vampire.higherOrderFallback.get options && vampire.quiet.get options &&
+      vampire.parallel.get options && vampire.portfolioCores.get options == 1 &&
+      vampire.cache.get options do
     throwError "unexpected tactic defaults"
 
-/-- info: vampire closed the goal. -/
 #guard_msgs in
 example (h : True) : True := by
   vampire [h]
 
+/-- info: vampire closed the goal. -/
 #guard_msgs in
 example (h : True) : True := by
-  vampire [h] (quiet := true)
+  vampire [h] (quiet := false)
 
 -- Verify actual tactic errors without depending on source positions.
 elab "expect_vampire_error " expected:str " in " action:tacticSeq : tactic => do
@@ -33,7 +35,7 @@ elab "expect_vampire_error " expected:str " in " action:tacticSeq : tactic => do
 example : True := by
   expect_vampire_error "between 0 and 100" in vampire (sliceHoFirst := 101)
   expect_vampire_error "total at most 100%" in vampire (sliceHoFirst := 50) (sliceFo := 80)
-  expect_vampire_error "For unlimited search" in vampire (timeout := 0)
+  expect_vampire_error "For unlimited search" in vampire (parallel := false) (timeout := 0)
   expect_vampire_error "expected `true` or `false`" in vampire (quiet := 1)
   expect_vampire_error "unknown setting" in vampire (notAnOption := true)
   expect_vampire_error "unknown setting" in vampire (stagedSearch := true)
@@ -52,7 +54,8 @@ example (P : Prop) (h : P) : P := by
       (executable := "/definitely/missing/vampire")
   exact h
 
--- The default routed schedule runs before FO and uses a shared finite budget.
+-- Opting out of parallel search retains the routed schedule and shared budget.
+set_option vampire.parallel false
 
 set_option vampire.executable "Tests/testdata/scripts/mock-slice-search.py" in
 set_option vampire.outputPath "artifacts/default-routed-slices.p" in

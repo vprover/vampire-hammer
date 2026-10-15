@@ -1,5 +1,8 @@
 import VampireHammer
 
+-- Keep the route-specific protocol deterministic under the parallel default.
+set_option vampire.parallel false
+
 set_option vampire.routedSlices false
 run_cmd Lean.Elab.Command.modifyScope fun scope =>
   { scope with opts := scope.opts.set `vampire.internal.routedSearch true }

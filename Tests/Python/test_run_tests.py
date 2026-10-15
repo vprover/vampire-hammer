@@ -25,25 +25,31 @@ class RunnerTests(unittest.TestCase):
         self.assertFalse(certificates & real)
         self.assertEqual({p.name for p in real}, runner.REAL_PROVER_FILES)
         self.assertIn(runner.PROJECT / "Tests/Export/TffExporterTests.lean", certificates)
-        self.assertIn(runner.PROJECT / "benchexec/tests/ComparisonBenchmarkTests.lean", real)
+        self.assertIn(runner.PROJECT / "Examples/CentralSquaresExample.lean", real)
         self.assertFalse(any("Exploratory" in p.parts for p in all_files))
         self.assertEqual(all_files, set((runner.PROJECT / "Tests").rglob("*.lean")) |
-                         set((runner.PROJECT / "Examples").glob("*.lean")) |
-                         set((runner.PROJECT / "benchexec/tests").rglob("*.lean")))
+                         set((runner.PROJECT / "Examples").glob("*.lean")))
 
     def test_paths_and_unique_basenames_select_same_file(self):
         expected = runner.PROJECT / "Tests/Parser/ParserNumberTests.lean"
         self.assertEqual(runner.resolve_file("ParserNumberTests.lean"), expected)
         self.assertEqual(runner.resolve_file("Tests/Parser/ParserNumberTests.lean"), expected)
-        self.assertEqual(runner.resolve_file("FailingExample.lean"),
-                         runner.PROJECT / "Examples/Exploratory/FailingExample.lean")
-        self.assertEqual(runner.resolve_file("ComparisonBenchmarkTests.lean"),
-                         runner.PROJECT / "benchexec/tests/ComparisonBenchmarkTests.lean")
+        self.assertEqual(runner.resolve_file("CentralSquaresExample.lean"),
+                         runner.PROJECT / "Examples/CentralSquaresExample.lean")
 
-    def test_python_discovery_covers_tooling_and_benchmarks(self):
+    def test_explicit_selection_can_include_exploratory_examples(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            project = Path(temporary)
+            example = project / "Examples/Exploratory/FailingExample.lean"
+            example.parent.mkdir(parents=True)
+            example.touch()
+            with patch.object(runner, "PROJECT", project):
+                self.assertEqual(runner.resolve_file("FailingExample.lean"), example)
+                self.assertNotIn(example, runner.regression_files("all"))
+
+    def test_python_discovery_covers_included_regressions(self):
         modules = {test_id.split('.')[0] for test_id in runner.test_ids(runner.python_tests())}
-        self.assertEqual(modules, {"test_run_tests", "test_benchmark_mathlib",
-                                  "test_benchexec_suite", "test_benchmark_startup"})
+        self.assertEqual(modules, {"test_run_tests", "test_benchmark_mathlib"})
 
     def test_invalid_paths_and_ambiguous_basenames_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:

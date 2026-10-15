@@ -1,5 +1,9 @@
 import VampireHammer
 
+-- This test exercises required versus optional facts in the native route only.
+set_option vampire.parallel false
+set_option vampire.routedSlices false
+
 open Lean Meta Elab Tactic
 open VampireHammer.Export.Internal
 

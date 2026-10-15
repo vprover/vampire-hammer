@@ -21,11 +21,6 @@ register_option vampire.benchmarkComparison : Bool := {
   descr := "Load identical baseline imports for every comparison run"
 }
 
-register_option vampire.benchmarkBundledPremises : Bool := {
-  defValue := true
-  descr := "Supply structure-valued definitions from the original proof as extra VampireHammer benchmark hints"
-}
-
 initialize benchmarkTactics : IO.Ref (Std.HashMap String (Array Name → TermElabM Term)) ← IO.mkRef {}
 
 /-- Optional baseline imports register their syntax without adding dependencies
@@ -70,26 +65,6 @@ private def proofPremisesOf (info : ConstantInfo) : CoreM (Array Name) := do
   let names ← names.filterM fun name => do
     return name != info.name && !(← EvalAuto.Name.onlyLogicInType name)
   return names.qsort (fun a b => a.toString < b.toString)
-
-/-- Bundled values used by the original proof, such as `ENNReal.toRealHom` in
-`map_prod ENNReal.toRealHom …` or `Equiv.ulift` in `Equiv.isEmpty Equiv.ulift`:
-definitions whose type, after their arguments, is a structure other than a
-class. Theorem premises cannot mention them: the hammer relates the
-coercions of closed ones to the goal's functions (`CoercionBridges`) and
-instantiates data arguments of premises with all of them (`DataWitnesses`).
-Only the hammer receives them; at most eight. -/
-private def bundledPremisesOf (info : ConstantInfo) : CoreM (Array Name) := do
-  let some proof := info.value? (allowOpaque := true) | return #[]
-  let env ← getEnv
-  let names := proof.getUsedConstants.filter fun name =>
-    !name.isInternalDetail && !isInstanceCore env name && (env.getProjectionFnInfo? name).isNone &&
-    match env.find? name with
-    | some (.defnInfo definition) =>
-      match definition.type.getForallBody.getAppFn with
-        | .const typeName _ => isStructure env typeName && !isClass env typeName
-        | _ => false
-    | _ => false
-  return (names.qsort (fun a b => a.toString < b.toString)).extract 0 8
 
 def proofPremises (target : Name) : CoreM (Array Name) := do
   proofPremisesOf (← getConstInfo target)
@@ -151,13 +126,7 @@ private def tryTheorem (target : Name) (path : String) (useProofPremises : Bool)
         | throwError "benchmark prover {prover} is not registered; import VampireHammer.Benchmark.Comparison"
       builder premises
     else if useProofPremises then do
-      let bundled ← if vampire.benchmarkBundledPremises.get (← getOptions) then
-          bundledPremisesOf info
-        else pure #[]
-      if !bundled.isEmpty then
-        appendEvent path <| Json.mkObj [("event", toJson "bundled_premises"),
-          ("name", toJson target.toString), ("bundled_premises", toJson (bundled.map Name.toString))]
-      let terms : Array Term := (premises ++ bundled).map (fun name => ⟨mkIdent name⟩)
+      let terms : Array Term := premises.map (fun name => ⟨mkIdent name⟩)
       let hints ← terms.mapM (fun term => `(Auto.hintelem| $term:term))
       let hints := #[(← `(Auto.hintelem| *))] ++ hints
       `(term| by intros; vampire [$[$hints],*])

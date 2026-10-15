@@ -6,6 +6,7 @@ Import `VampireHammer` to use the tactics.
 | --- | --- |
 | [Tactic.lean](Tactic.lean) | Tactic syntax, goal preparation and proof assignment |
 | [Options.lean](Options.lean) | Configuration names and defaults |
+| [ProofCache.lean](ProofCache.lean) | Bounded session cache of closed, kernel-checked Lean proofs |
 | [Export/](Export/) | Premise collection, translation and Vampire invocation |
 | [TFF.lean](TFF.lean) | Typed first-order encoding |
 | [TSTP.lean](TSTP.lean) | TPTP parser interface |

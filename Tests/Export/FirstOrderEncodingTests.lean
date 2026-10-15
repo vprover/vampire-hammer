@@ -1,4 +1,9 @@
 import VampireHammer
+
+-- Exercise the FO encoding and its opt-out without a native HO alternative.
+set_option vampire.parallel false
+set_option vampire.routedSlices false
+
 set_option vampire.executable "Tests/testdata/scripts/local-vampire.sh"
 set_option vampire.attributeLemmas false
 set_option vampire.outputPath "artifacts/first-order-encoding-ordinary.p" in

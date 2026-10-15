@@ -37,11 +37,27 @@ example (p q : α → Prop) (a : α) (h₁ : ∀ x, p x → q x) (h₂ : p a) : 
 ```
 
 Use `vampire [*]` for all local hypotheses. Per-call settings include
-`(timeout := 20)`, `(quiet := true)`, `(unfold := [f])` and `(defeq := [f])`.
+`(timeout := 20)`, `(quiet := false)`, `(unfold := [f])` and `(defeq := [f])`.
+Successful calls are silent by default; `(quiet := false)` enables a success message.
 
-The default search budget is 10 seconds, shared between higher-order and
-first-order search. Translation and reconstruction also use Lean's heartbeat
+The default search allowance is 10 seconds per parallel attempt.
+Translation and reconstruction also use Lean's heartbeat
 budget. See [tactic options](docs/TACTIC_OPTIONS.md) for configuration.
+
+Concurrent search is enabled by default. It monomorphizes once for the
+original goal, then races native HO and
+checked FO search. When goal decomposition is enabled, a separate attempt
+splits the goal and searches its branches alongside the original attempt.
+The first successfully replayed proof wins and cancels the other attempts.
+Use `(portfolioCores := 4)` to run four workers within each FO Vampire
+portfolio; this also works with the sequential tactic schedule.
+The independent `portfolioCores` setting defaults to `1` per portfolio.
+Use `(parallel := false)` to select the sequential tactic schedule.
+
+Completed Lean proofs are cached in memory during the Lean session. Repeated
+matching calls reuse the checked proof, skipping preparation, search and replay.
+Use `(cache := false)` to force a fresh run, or `set_option trace.vampire.cache true`
+to see cache hits and misses. See [cache details](docs/TACTIC_OPTIONS.md#session-proof-cache).
 
 `vampire_export` exports a problem without proving the goal.
 Set `vampire.outputPath` to retain the input and prover output, or

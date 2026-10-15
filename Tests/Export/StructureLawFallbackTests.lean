@@ -1,5 +1,10 @@
 import VampireHammer
 
+-- Exercise the sequential FO record-law retry and its five-second allowance.
+set_option vampire.parallel false
+set_option vampire.routedSlices false
+set_option vampire.timeLimit 5
+
 set_option vampire.executable "Tests/testdata/scripts/mock-record-law-retry.sh"
 set_option vampire.outputPath "artifacts/record-law-retry.p"
 

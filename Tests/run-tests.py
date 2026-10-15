@@ -13,11 +13,12 @@ import unittest
 
 
 PROJECT = Path(__file__).resolve().parents[1]
-LEAN_TEST_DIRECTORIES = ("Tests", "benchexec/tests")
-PYTHON_TEST_DIRECTORIES = ("Tests/Python", "benchexec")
+LEAN_TEST_DIRECTORIES = ("Tests",)
+PYTHON_TEST_DIRECTORIES = ("Tests/Python",)
 # These exercises invoke the real prover; the other regression files use
 # checked fixtures or test the metaprogramming/proof interfaces directly.
 REAL_PROVER_FILES = {
+    "CentralSquaresExample.lean",
     "FoolConditionalTests.lean",
     "BoolBridgeTests.lean",
     "StructureLawTests.lean",
@@ -32,8 +33,6 @@ REAL_PROVER_FILES = {
     "GoalDecompositionTests.lean",
     "MonoDecompositionTests.lean",
     "AutomaticUnfoldingTests.lean",
-    "AvatarExample.lean",
-    "ComparisonBenchmarkTests.lean",
     "DomainInhabitationTests.lean",
     "HigherOrderInhabitationTests.lean",
     "HigherOrderOptionalPremiseTests.lean",
@@ -59,12 +58,10 @@ REAL_PROVER_FILES = {
     "LawInstancesTests.lean",
     "SiblingLemmasTests.lean",
     "EqualityFactoringExample.lean",
-    "Example.lean",
     "FactoringExample.lean",
     "MathlibHammerTests.lean",
     "MathlibFailureRegressionTests.lean",
     "TranslationAlignmentTests.lean",
-    "NaturalNumbers.lean",
     "OptionalPremiseTests.lean",
     "PortfolioReplayTests.lean",
     "PropositionClassTests.lean",
@@ -80,7 +77,7 @@ REAL_PROVER_FILES = {
 
 
 def python_tests():
-    """Discover both tooling and benchmark regressions."""
+    """Discover the Python regressions included in this checkout."""
     suite = unittest.TestSuite()
     for directory in PYTHON_TEST_DIRECTORIES:
         start = str(PROJECT / directory)

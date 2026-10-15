@@ -1,10 +1,11 @@
 # VampireHammer options and defaults
 
-This reference covers every `vampire.*` option registered by this repository,
+This reference covers every core `vampire.*` option registered by this repository,
 plus tactic settings, trace switches, internal search keys, and Lake build
 settings. Defaults below are declaration defaults; individual search routes
 may override them as described below. Dependency options belonging to Lean,
-lean-auto, or Vampire itself are outside this reference.
+lean-auto, or Vampire itself, and optional benchmark-only settings, are outside
+this reference.
 
 ## Setting options
 
@@ -45,11 +46,79 @@ problem through `vampire.mockScript` and leaves the goal unchanged.
 Facts such as `[h₁, h₂, Nat.add_comm]` select premises; `[*]` selects all
 local hypotheses. They are separate from settings.
 
+## Parallel search
+
+```lean
+vampire [h₁, h₂]                       -- parallel, one worker per portfolio
+vampire (portfolioCores := 2) [h₁, h₂] -- parallel, two workers per portfolio
+```
+
+`parallel` is enabled by default and overrides the sliced schedule. The original goal shares one
+monomorphization between native HO and checked FO; each route independently
+exports, searches and replays. If `decomposeGoals` is enabled and the goal
+can split, a concurrent attempt prepares the split goals, with a separate
+monomorphization for each leaf. Leaves are solved in sequence, each racing
+FO and HO with the split attempt's remaining budget.
+
+The first successful replay commits its Lean state and cancels and joins the
+other attempts. A failed export, search or replay does not prevent another
+route from winning. Each attempt receives the full search allowance rather
+than a percentage slice; split leaves share their attempt's allowance.
+`timeout := 0` permits unlimited parallel search. Lean heartbeat limits still
+apply to preparation and replay. Slice percentages, decomposition reserves,
+plain/library-suggestion slices and `monoHeartbeats` are unused in this mode.
+
+`portfolioCores` controls Vampire's `--cores` in FO portfolio mode: `1` keeps
+one worker, a larger number enables concurrent workers, and `0` uses all
+available cores. It applies with or without `parallel`. Native HO uses a
+single search process. In single-route mode, an explicit encoded strategy
+also uses one process. In parallel mode, an encoded strategy applies to HO;
+FO uses its default search configuration, as in routed search.
+With parallel goal decomposition, both the original goal and the current
+split leaf can each run a portfolio and an HO process concurrently.
+
+When `outputPath` is set, parallel routes use `.fo.p` and `.ho.p` suffixes.
+The decomposition attempt adds `.split.branch-N.p` before the route suffix,
+so concurrent attempts retain separate inputs, outputs and event logs.
+
+## Session proof cache
+
+`cache` defaults to `true`. Each Lean process keeps up to 128 completed Lean
+proof terms in memory. A matching call instantiates the saved proof in the
+current local context and checks the entire term with Lean's kernel before
+using it. A hit skips fact collection, monomorphization, Vampire and replay.
+No prover output or cache files are written to disk.
+
+The key includes the goal, local context (including local let values), resolved
+identifier premises, unfold/defeq settings and Vampire/lean-auto options. Fresh local IDs,
+binder names and universe-parameter names do not prevent reuse. Referenced
+declarations are checked against the current environment; invalid entries fall
+back to ordinary proof search. Temporary helper theorems created during replay
+are inlined into the cached term.
+
+Calls with complex premise expressions (such as `[h a]` or `[by ...]`), premise
+databases, or unresolved metavariables bypass the cache. This avoids elaborating
+user-provided terms twice. Failed, incomplete and `sorry` proofs are not stored.
+The cache disappears when the Lean worker restarts and is not shared between
+separate Lean processes.
+
+```lean
+set_option trace.vampire.cache true -- report hits, misses and bypasses
+-- Force search even if the proof is cached:
+example (p : Prop) (h : p) : p := by vampire (cache := false) [h]
+-- Clear every entry in this Lean process:
+run_cmd VampireHammer.ProofCache.clear
+```
+
+Disable caching when benchmarking or collecting fresh prover artifacts and
+timings. Cache hits do not launch Vampire or rewrite its output artifacts.
+
 ## Units and constraints
 
-- `timeLimit` is a shared external proof-search budget in **seconds**, not a
-  wall-clock limit for the whole tactic. Translation and proof reconstruction
-  also consume Lean's heartbeat budget.
+- `timeLimit` is an external proof-search allowance in **seconds**, per attempt
+  in parallel mode and shared in sequential mode. It is not a wall-clock limit
+  for the whole tactic. Translation and proof reconstruction also consume
+  Lean's heartbeat budget.
 - `satPrecheck` is in **deciseconds**: `10` requests one second.
 - Heartbeat options use Lean's user-facing units, each representing **1,000
   internal heartbeats**. These measure computation, not elapsed seconds.
@@ -58,47 +127,51 @@ local hypotheses. They are separate from settings.
 - `plainSliceShare`, `higherOrderSliceShare`, `sliceHoFirst`, `sliceFo`,
   `sliceFoBeforeRecovery`, and `decompositionReserve` must be between `0`
   and `100`. Additionally, `sliceHoFirst + sliceFo` must be at most `100`.
-- `timeLimit := 0` means unlimited external search only when
-  `routedSlices := false`. The default routed schedule requires a positive
-  budget. Other zero values have option-specific meanings listed below.
+- `timeLimit := 0` permits unlimited parallel search. In sequential mode,
+  unlimited search requires `routedSlices := false`. Other zero values have
+  option-specific meanings listed below.
 
 ## Search and scheduling
 
 | Option | Type | Default | Effect |
 | --- | --- | --- | --- |
-| `vampire.timeLimit` | `Nat` | `10` | Shared external proof-search budget in seconds (0 means unlimited; routedSlices requires a positive budget) |
+| `vampire.timeLimit` | `Nat` | `10` | External proof-search allowance in seconds, per attempt in parallel mode and shared in sequential mode (0 means unlimited; sequential routedSlices requires a positive budget) |
+| `vampire.parallel` | `Bool` | `true` | Race native HO and checked FO search after shared monomorphization, and concurrently try goal decomposition when enabled; overrides routedSlices |
 | `vampire.routedSlices` | `Bool` | `true` | Time-sliced HO -> FO -> HO schedule over one shared monomorphization: native HO searches its share first, FO then searches its share plus any time HO left unspent, and HO searches again with the alternate strategy only if FO ended early (finite model, GaveUp or another failure, not a timeout) and HO had been prepared (requires a finite timeLimit; ignores monoHeartbeats) |
 | `vampire.sliceHoFirst` | `Nat` | `20` | Percentage of the search budget for the first native HO slice of routedSlices |
 | `vampire.sliceFo` | `Nat` | `80` | Percentage of the search budget for the FO slice of routedSlices (plus unspent time of the first HO slice) |
 | `vampire.sliceFoBeforeRecovery` | `Nat` | `10` | Percentage of the search budget for the first-order slice when the native slice failed on a missing domain; the tactic's inhabitant recovery then retries with the remaining time |
 | `vampire.decompositionReserve` | `Nat` | `30` | With routedSlices, percentage of the search budget held back from the main attempt for goal decomposition when the goal is one it can split; unspent main time is returned to it |
-| `vampire.higherOrder` | `Bool` | `false` | When routedSlices is disabled, select native higher-order THF (true) or first-order TFF (false); also controls export-only calls |
+| `vampire.higherOrder` | `Bool` | `false` | When parallel and routedSlices are disabled, select native higher-order THF (true) or first-order TFF (false); also controls export-only calls |
 | `vampire.higherOrderFallback` | `Bool` | `false` | Retry failed native higher-order problems with the checked first-order encoding |
 | `vampire.higherOrderSliceShare` | `Nat` | `75` | Percentage of the remaining search budget for native higher-order search before a first-order retry |
 | `vampire.higherOrderSearchRetry` | `Bool` | `true` | Retry a fast native HO GaveUp with extensionality and heuristic instantiation, using only unspent search time |
 | `vampire.strategy` | `String` | `""` | Encoded strategy passed to Vampire with `--decode` |
 | `vampire.use_portfolio` | `Bool` | `true` | Use Vampire portfolio mode when vampire.strategy is empty |
+| `vampire.portfolioCores` | `Nat` | `1` | Number of Vampire portfolio workers (0 uses all available cores); applies when use_portfolio is true and strategy is empty |
 | `vampire.satPrecheck` | `Nat` | `0` | Finite model building run before proof search, in deciseconds (0 disables) |
 | `vampire.plainSliceShare` | `Nat` | `50` | Percentage of the search budget for the attempt without library suggestions |
 
-By default, routed search prepares first-order (FO) and native higher-order
+With `parallel := false`, routed search prepares first-order (FO) and native higher-order
 (HO) representations together, tries HO with 20% of the available search
 budget, then FO with 80% plus unspent HO time. A final alternate HO attempt
 uses remaining time only if FO finishes early and HO preparation succeeded.
 For a splittable goal, `decompositionReserve` holds back 30% before this
 main attempt; decomposition can also use time the main attempt leaves over.
 
-With `routedSlices := true`, the schedule chooses its own representations,
+With parallel search disabled and `routedSlices := true`, the schedule chooses its own representations,
 so `higherOrder` does not force it to stay on HO or FO, and `monoHeartbeats`
-is ignored. To select a single route, set `routedSlices := false` and choose
+is ignored. To select a single route, set `parallel := false` and
+`routedSlices := false`, then choose
 `higherOrder`. Export-only calls also use `higherOrder` to choose THF or TFF.
 `higherOrderFallback` and `higherOrderSliceShare` configure the HO-to-FO retry
-outside the default routed schedule. `higherOrderSearchRetry` permits a fast
+outside parallel and routed search. `higherOrderSearchRetry` permits a fast
 HO `GaveUp` to retry with extensionality and heuristic instantiation.
 
 A nonempty `strategy` is passed with `--decode`. `use_portfolio` applies to
 FO search when no encoded strategy is supplied; native HO uses its own search
-configuration. `plainSliceShare` matters when `suggestedLemmas > 0`: first
+configuration. In sequential mode, `plainSliceShare` matters when
+`suggestedLemmas > 0`: first
 try without library suggestions, then retry with suggestions and the unspent
 budget. Set `plainSliceShare := 0` to skip that initial plain attempt.
 
@@ -161,7 +234,7 @@ associated retry. With a positive window on the applicable FO route,
 exhaustion can trigger bounded constructor decomposition followed by a
 native HO retry without constant-specialization saturation. This retry may
 lose useful dependent or polymorphic instances. `monoDecomposition` requires
-`decomposeGoals` and is inactive under the default routed schedule.
+`decomposeGoals` and is inactive under parallel or routed search.
 
 `decompositionGoalLimit := 0` disables goal decomposition.
 `domainWitnessHeartbeats := 0` disables optional local domain-witness recovery.
@@ -197,7 +270,8 @@ enclosing Lean limit.
 
 | Option | Type | Default | Effect |
 | --- | --- | --- | --- |
-| `vampire.quiet` | `Bool` | `false` | Suppress the success message after vampire closes the goal (errors are still reported) |
+| `vampire.quiet` | `Bool` | `true` | Suppress the success message after vampire closes the goal (errors are still reported) |
+| `vampire.cache` | `Bool` | `true` | Reuse completed kernel-checked Lean proofs from a bounded in-memory cache in this Lean process |
 | `vampire.executable` | `String` | `""` | Path to the Vampire executable (empty: the package-built Vampire, else `vampire` on PATH) |
 | `vampire.outputPath` | `String` | `""` | If set, save the TPTP input here and raw Vampire output beside it |
 | `vampire.mockScript` | `String` | `"Tests/testdata/scripts/mock-vampire.sh"` | Shell script that captures the TPTP problem on stdin |
@@ -240,6 +314,7 @@ system and are not inline `vampire` settings.
 | `trace.vampire.unfold` | Definition unfolding and source normalization. |
 | `trace.vampire.premises` | Automatic premise selection. |
 | `trace.vampire.replay` | Proof decoding and reconstruction diagnostics. |
+| `trace.vampire.cache` | Session proof-cache hits, misses, and bypasses. |
 | `trace.vampire.bridge` | Diagnostics for the `vampire_bridge` interface. |
 
 ## Internal search keys
@@ -286,6 +361,9 @@ from the `tptp-replay-annotations` branch. The `vampireRevision` constant in
 that commit directly, and existing checkouts at another commit are switched
 to the pin without forcing local changes. Deleting `.lake/vampire` rebuilds
 the same pinned version.
+
+Before configuring CMake, the build initializes `cadical` and `viras` and
+recovers submodule clones interrupted before their initial checkout.
 
 ## Sources
 

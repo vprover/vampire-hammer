@@ -1,5 +1,8 @@
 import VampireHammer
 
+-- Keep the route-specific protocol deterministic under the parallel default.
+set_option vampire.parallel false
+
 -- Exercise the single-route protocol independently of the default sliced search.
 set_option vampire.routedSlices false
 
@@ -7,13 +10,14 @@ set_option vampire.executable "Tests/testdata/scripts/mock-strategy.sh"
 set_option vampire.disableAvatar true
 set_option vampire.timeLimit 7
 
-private def assertArguments (path : String) (strategy : String) (portfolio : Bool := true) (proofExtra : String := "replay") : IO Unit := do
+private def assertArguments (path : String) (strategy : String) (portfolio : Bool := true)
+    (proofExtra : String := "replay") (cores : Nat := 1) : IO Unit := do
   let output ← IO.FS.readFile (path ++ ".stdout")
   let actual := (output.splitOn "\n").filterMap fun line =>
     if line.startsWith "% Argument: " then some (line.drop 12 |>.toString) else none
   let decode := if strategy.isEmpty then [] else ["--decode", strategy]
   let mode := if strategy.isEmpty && portfolio then "portfolio" else "vampire"
-  let expected := decode ++ ["--mode", mode, "--cores", "1", "--shuffle_input", "off",
+  let expected := decode ++ ["--mode", mode, "--cores", toString cores, "--shuffle_input", "off",
     "--shuffle_on_schedule_repeats", "off", "--forced_options",
     "proof=tptp_ac:replay=on:skolemization=syntactic:shuffle_input=off:newcnf=off:avatar=off:proof_extra=" ++ proofExtra,
     "-p", "tptp_ac", "--replay", "on", "--skolemization", "syntactic",
@@ -30,6 +34,23 @@ example {α : Type} (a : α) (P : α → Prop)
   vampire [parent, notP]
 
 #eval assertArguments "artifacts/strategy-default.p" ""
+
+-- Vampire worker counts are independent of tactic-level parallel execution.
+set_option vampire.outputPath "artifacts/strategy-workers.p" in
+example {α : Type} (a : α) (P : α → Prop)
+    (parent : ∀ x, x ≠ a ∨ P x) (notP : ¬ P a) : False := by
+  vampire (portfolioCores := 3) [parent, notP]
+
+#eval assertArguments "artifacts/strategy-workers.p" "" (cores := 3)
+
+-- Zero is forwarded to Vampire's automatic worker selection (the mock does
+-- not actually start workers).
+set_option vampire.outputPath "artifacts/strategy-auto-workers.p" in
+example {α : Type} (a : α) (P : α → Prop)
+    (parent : ∀ x, x ≠ a ∨ P x) (notP : ¬ P a) : False := by
+  vampire (portfolioCores := 0) [parent, notP]
+
+#eval assertArguments "artifacts/strategy-auto-workers.p" "" (cores := 0)
 
 set_option vampire.strategy "lrs+10_1_100"
 

@@ -19,7 +19,11 @@ flowchart LR
 
 lean-auto provides monomorphization, reification and checked preprocessing.
 TF0 is the typed first-order format; THF preserves supported higher-order
-terms. The default schedule shares its search budget between these routes.
+terms. By default the routes race after shared monomorphization, alongside a
+goal-decomposition attempt when applicable. Only the first successful replay
+is committed; other attempts are cancelled. Vampire portfolios independently
+default to one worker each (`portfolioCores`). Set `parallel := false` to use
+the sequential schedule with a shared search budget.
 
 Replay checks source facts and reconstructs derived nodes from their parents.
 The completed local theorem crosses the lean-auto import boundary once.

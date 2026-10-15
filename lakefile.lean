@@ -75,8 +75,33 @@ private def gitOutput (repository : FilePath) (args : Array String) : LogIO Stri
   let output ← captureProc { cmd := "git", args := #["-C", repository.toString] ++ args }
   return output.trimAscii.toString
 
-/-- Fetch the pinned Vampire commit (shallow; CMake fetches the `cadical`
-and `viras` submodules it needs) and build a Release binary. The build is
+/-- Probe incomplete checkouts without logging an expected nonzero exit as a
+Lake build failure. -/
+private def gitHead? (repository : FilePath) : LogIO (Option String) := do
+  let output ← IO.Process.output {
+    cmd := "git"
+    args := #["-C", repository.toString, "rev-parse", "--verify", "HEAD"]
+  }
+  return if output.exitCode == 0 then some output.stdout.trimAscii.toString else none
+
+/-- Initialize Vampire's build dependencies, including recovery from a submodule
+clone interrupted before its first checkout. Do not force checkouts: local
+changes should cause Git to report a conflict rather than be overwritten. -/
+private def prepareVampireSubmodules (source : FilePath) : LogIO Unit := do
+  for name in #["cadical", "viras"] do
+    let submodule := source / name
+    if ← (submodule / ".git").pathExists then
+      let hasHead := (← gitHead? submodule).isSome
+      unless hasHead do
+        let revision ← gitOutput source #["rev-parse", s!"HEAD:{name}"]
+        logInfo s!"recovering incomplete Vampire submodule `{name}`"
+        proc { cmd := "git", args := #["-C", submodule.toString, "fetch", "origin", revision] }
+        proc { cmd := "git", args := #["-C", submodule.toString, "checkout", "--detach", revision] }
+  proc { cmd := "git", args := #["-C", source.toString, "submodule", "update", "--init",
+    "--checkout", "--", "cadical", "viras"] }
+
+/-- Fetch the pinned Vampire commit (shallow), initialize its required
+submodules, and build a Release binary. The build is
 redone when the pinned commit or linking mode changes. -/
 target vampire pkg : FilePath := Job.async do
   let root := pkg.lakeDir / "vampire"
@@ -88,8 +113,7 @@ target vampire pkg : FilePath := Job.async do
   unless ← (source / ".git").pathExists do
     IO.FS.createDirAll source
     proc { cmd := "git", args := #["init", source.toString] }
-  let checkedOut ← try gitOutput source #["rev-parse", "--verify", "HEAD"]
-    catch _ => pure ""
+  let checkedOut := (← gitHead? source).getD ""
   unless checkedOut == vampireRevision do
     logInfo s!"fetching Vampire commit `{vampireRevision}` from {vampireRepository}"
     proc { cmd := "git", args := #["-C", source.toString, "fetch", "--depth", "1",
@@ -105,6 +129,7 @@ target vampire pkg : FilePath := Job.async do
       return executable
   let jobs ← vampireJobs
   logInfo s!"building Vampire {wanted} with {jobs} parallel jobs"
+  prepareVampireSubmodules source
   proc { cmd := "cmake", args := #["-S", source.toString, "-B", build.toString,
     "-DCMAKE_BUILD_TYPE=Release",
     if vampireStatic then "-DBUILD_SHARED_LIBS=OFF" else "-DBUILD_SHARED_LIBS=ON",

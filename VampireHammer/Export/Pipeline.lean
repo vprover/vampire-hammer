@@ -1,6 +1,7 @@
 import VampireHammer.Export.Problem
 import VampireHammer.Export.Process
 import VampireHammer.Export.Routing
+import VampireHammer.Export.Parallel
 import VampireHammer.Replay
 
 /-!
@@ -354,6 +355,29 @@ private def searchPrepared (prepared : PreparedQuery) (budget : IO.Ref Nat)
     invokeVampire prepared.problem none (if unlimited then none else some remaining) alternateHO
   prepared.replay parsed
 
+/-- Monomorphize once, then independently export, search and replay both
+representations. Each worker gets the whole remaining search allowance. -/
+private def replayParallel (lemmas inhs : Array Auto.Lemma)
+    (searchBudget? : Option (IO.Ref Nat)) : MetaM Expr := do
+  let options ← getOptions
+  let budget ← match searchBudget? with
+    | some budget => pure budget
+    | none => IO.mkRef (vampire.timeLimit.get options * 1000)
+  let originalContext ← getLCtx
+  let body : Auto.Reif.ReifM Expr := do
+    let reifState ← get
+    let total ← budget.get
+    let actions := #[Routing.Route.higherOrder, .firstOrder].map fun route => do
+      let destination := vampire.outputPath.get options
+      withOptions (fun options => (routeOptions route options).set `vampire.outputPath
+          (if destination.isEmpty then "" else destination ++ s!".{route.name}.p")) do
+        let prepared ← (preparedFromState originalContext).run' reifState
+        let ownBudget ← IO.mkRef total
+        searchPrepared prepared ownBudget
+    liftM <| chargeSearch budget (raceMeta actions)
+  let (proof, _) ← monomorphizeWithOptionalFacts lemmas inhs (fun state => body state)
+  return proof
+
 /-- Shared-preparation search. One source rewriting and monomorphization feeds
 both representations: the first route is prepared and given the whole budget;
 if it fails (export, search without a refutation, decoding, replay) the other
@@ -581,6 +605,8 @@ def replayVampireWithAuto (lemmas inhs : Array Auto.Lemma)
     (searchBudget? : Option (IO.Ref Nat) := none)
     (deferMonoFallback : Bool := false) (monoBudget? : Option (IO.Ref Nat) := none) : MetaM Expr := do
   let options ← getOptions
+  if vampire.parallel.get options then
+    return ← replayParallel lemmas inhs searchBudget?
   if vampire.routedSlices.get options then
     return ← replayRoutedSearch lemmas inhs searchBudget?
   if InternalSearch.staged options then

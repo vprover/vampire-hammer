@@ -7,11 +7,15 @@ import unittest
 from unittest.mock import patch
 
 
-spec = importlib.util.spec_from_file_location("benchmark_mathlib", Path(__file__).resolve().parents[2] / "Tests/scripts/benchmark-mathlib.py")
-benchmark = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(benchmark)
+SCRIPT = Path(__file__).resolve().parents[2] / "Tests/scripts/benchmark-mathlib.py"
+benchmark = None
+if SCRIPT.is_file():
+    spec = importlib.util.spec_from_file_location("benchmark_mathlib", SCRIPT)
+    benchmark = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(benchmark)
 
 
+@unittest.skipIf(benchmark is None, "Optional benchmark script is not included in this checkout")
 class BenchmarkTests(unittest.TestCase):
     def test_resume_rejects_changed_vampire_binary(self):
         with tempfile.TemporaryDirectory() as temporary:

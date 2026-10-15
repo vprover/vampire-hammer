@@ -1,0 +1,27 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for flex-flex
+% SZS output start Proof for flex-flex
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, a: i).
+thf(func_def_1, type, b: i).
+thf(f1,axiom,(
+  ! [X0 : (i > i),X1 : (i > i)] : (((X0 @ a)) != ((X1 @ b)))),
+  file('Tests/testdata/higher-order/flex-flex.p','all')).
+thf(f2,plain,(
+  ( ! [X0 : (i > i),X1 : (i > i)] : ((((X0 @ a)) != ((X1 @ b)))) )),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0),b(X1,X1)]),literal_permutation([0]),swapped_equalities([])],[f1])).
+thf(f3,plain,(
+  $false),
+  inference('flex-flex_simplification',[unifier([subs(f2,[b(X0,$thf(^[Y:i]:a)),b(X1,$thf(^[Y:i]:a))])])],[f2])).
+% SZS output end Proof for flex-flex
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.0000 s
+% Peak memory usage: 11 MB
+% ------------------------------
+% ------------------------------

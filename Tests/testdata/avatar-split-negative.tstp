@@ -1,0 +1,39 @@
+% Four ground literals become four negative AVATAR literals in reverse order.
+% This exercises definition rewriting below Not and the remaining AC change.
+tff(type_t_a0, type, t_a0: $o).
+tff(type_t_a1, type, t_a1: $o).
+tff(type_t_a2, type, t_a2: $o).
+tff(type_t_a3, type, t_a3: $o).
+tff(f1,axiom,(~t_a0 | ~t_a1 | ~t_a2 | ~t_a3),file('<stdin>','fact1')).
+tff(f2,axiom,t_a0,file('<stdin>','fact2')).
+tff(f3,axiom,t_a1,file('<stdin>','fact3')).
+tff(f4,axiom,t_a2,file('<stdin>','fact4')).
+tff(f5,axiom,t_a3,file('<stdin>','fact5')).
+tff(f6,plain,(~t_a0 | ~t_a1 | ~t_a2 | ~t_a3),
+  inference(cnf_transformation,[],[f1])).
+tff(f7,plain,t_a0,inference(cnf_transformation,[],[f2])).
+tff(f8,plain,t_a1,inference(cnf_transformation,[],[f3])).
+tff(f9,plain,t_a2,inference(cnf_transformation,[],[f4])).
+tff(f10,plain,t_a3,inference(cnf_transformation,[],[f5])).
+tff(f11,definition,(spl0_1 <=> t_a0),
+  introduced(definition,[new_symbols(definition,[spl0_1])],[avatar_definition])).
+tff(f12,definition,(spl0_2 <=> t_a1),
+  introduced(definition,[new_symbols(definition,[spl0_2])],[avatar_definition])).
+tff(f13,definition,(spl0_3 <=> t_a2),
+  introduced(definition,[new_symbols(definition,[spl0_3])],[avatar_definition])).
+tff(f14,definition,(spl0_4 <=> t_a3),
+  introduced(definition,[new_symbols(definition,[spl0_4])],[avatar_definition])).
+tff(f15,plain,(~spl0_4 | ~spl0_3 | ~spl0_2 | ~spl0_1),
+  inference(avatar_split_clause,[],[f6,f11,f12,f13,f14])).
+tff(f16,plain,spl0_1,inference(avatar_split_clause,[],[f7,f11])).
+tff(f17,plain,spl0_2,inference(avatar_split_clause,[],[f8,f12])).
+tff(f18,plain,spl0_3,inference(avatar_split_clause,[],[f9,f13])).
+tff(f19,plain,spl0_4,inference(avatar_split_clause,[],[f10,f14])).
+cnf(s1,plain,(~spl0_4 | ~spl0_3 | ~spl0_2 | ~spl0_1),
+  inference(sat_conversion,[],[f15])).
+cnf(s2,plain,spl0_1,inference(sat_conversion,[],[f16])).
+cnf(s3,plain,spl0_2,inference(sat_conversion,[],[f17])).
+cnf(s4,plain,spl0_3,inference(sat_conversion,[],[f18])).
+cnf(s5,plain,spl0_4,inference(sat_conversion,[],[f19])).
+cnf(s6,plain,$false,inference(rat,[],[s1,s2,s3,s4,s5])).
+tff(f20,plain,$false,inference(avatar_sat_refutation,[],[s6])).

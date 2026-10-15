@@ -1,0 +1,62 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for lambda-rewrite
+% SZS output start Proof for lambda-rewrite
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, f: (i > i)).
+thf(func_def_1, type, g: (i > i)).
+thf(func_def_2, type, h: (i > i)).
+thf(func_def_3, type, q: ((i > i) > $o)).
+thf(func_def_5, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_6, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_9, type, vNOT: ($o > $o)).
+thf(f1,axiom,(
+  (g = h)),
+  file('Tests/testdata/higher-order/lambda-rewrite.p','eq')).
+thf(f2,axiom,(
+  (q @ (^[X0 : i] : ((f @ (g @ X0)))))),
+  file('Tests/testdata/higher-order/lambda-rewrite.p','pos')).
+thf(f3,axiom,(
+  ~(q @ (^[X0 : i] : ((f @ (h @ X0)))))),
+  file('Tests/testdata/higher-order/lambda-rewrite.p','neg')).
+thf(f4,plain,(
+  (q @ (^[X0 : i] : ((f @ (g @ X0)))))),
+  inference(rectify,[],[f2])).
+thf(f5,plain,(
+  (((q @ (^[Y0 : i]: (f @ (g @ Y0))))) = $true)),
+  inference(fool_elimination,[],[f4])).
+thf(f6,plain,(
+  ~(q @ (^[X0 : i] : ((f @ (h @ X0)))))),
+  inference(rectify,[],[f3])).
+thf(f7,plain,(
+  ~ ($true = ((q @ (^[Y0 : i]: (f @ (h @ Y0))))))),
+  inference(fool_elimination,[],[f6])).
+thf(f8,plain,(
+  ($true != ((q @ (^[Y0 : i]: (f @ (h @ Y0))))))),
+  inference(flattening,[],[f7])).
+thf(f9,plain,(
+  (g = h)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f1])).
+thf(f10,plain,(
+  (((q @ (^[Y0 : i]: (f @ (g @ Y0))))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f5])).
+thf(f11,plain,(
+  ($true != ((q @ (^[Y0 : i]: (f @ (h @ Y0))))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f8])).
+thf(f14,plain,(
+  ($true = ((q @ (^[Y0 : i]: (f @ (h @ Y0))))))),
+  inference(definition_unfolding,[unifier([subs(f10,[]),subs(f9,[])]),rewritten_literal(literal(f10,0)),rewrite([equality(literal(f9,0)),from($thf(g)),to($thf(h))])],[f10,f9])).
+thf(f15,plain,(
+  $false),
+  inference(forward_subsumption_resolution,[unifier([subs(f11,[])]),removed_literals(literal(f14,0))],[f14,f11])).
+% SZS output end Proof for lambda-rewrite
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.0000 s
+% Peak memory usage: 11 MB
+% ------------------------------
+% ------------------------------

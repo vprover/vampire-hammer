@@ -1,0 +1,64 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% WARNING Broken Constraint: if shuffle_on_schedule_repeats(off) has been set then mode(vampire) is equal to cascormode(vampire) is equal to smtcompormode(vampire) is equal to portfolio
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+thf(type_def_5, type, s_a0: $tType).
+thf(func_def_0, type, t_a0: ((s_a0 > s_a0) > $o)).
+thf(func_def_1, type, t_a1: (s_a0 > s_a0)).
+thf(func_def_2, type, vNOT: ($o > $o)).
+thf(func_def_6, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_7, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_8, type, diff: !>[X0: $tType, X1: $tType]:(((X0 > X1) > (X0 > X1) > X0))).
+thf(f1,axiom,(
+  (~ (t_a0 @ t_a1))),
+  file('<stdin>','fact0')).
+thf(f2,axiom,(
+  (t_a0 @ (^[X0 : s_a0] : ((t_a1 @ X0))))),
+  file('<stdin>','fact1')).
+thf(f3,plain,(
+  (~ (t_a0 @ t_a1))),
+  inference(rectify,[],[f1])).
+thf(f4,plain,(
+  (((~ (t_a0 @ t_a1))) = $true)),
+  inference(fool_elimination,[],[f3])).
+thf(f5,plain,(
+  (t_a0 @ (^[X0 : s_a0] : ((t_a1 @ X0))))),
+  inference(rectify,[],[f2])).
+thf(f6,plain,(
+  ($true = ((t_a0 @ (^[Y0 : s_a0]: (t_a1 @ Y0)))))),
+  inference(fool_elimination,[],[f5])).
+thf(f8,plain,(
+  (((~ (t_a0 @ t_a1))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f4])).
+thf(f9,plain,(
+  ($true = ((t_a0 @ (^[Y0 : s_a0]: (t_a1 @ Y0)))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f6])).
+thf(f12,plain,(
+  (((t_a0 @ t_a1)) = $true)),
+  inference('beta-eta_normalization',[],[f9])).
+thf(f13,plain,(
+  (((t_a0 @ t_a1)) = $false)),
+  inference(not_proxy_clausification,[],[f8])).
+thf(f24,plain,(
+  ($true = $false)),
+  inference(constrained_superposition,[unifier([subs(f13,[]),subs(f12,[])]),constraints([]),rewrite([equality(literal(f12,0)),from($thf((t_a0 @ t_a1))),to($thf($true))]),rewritten_literal(literal(f13,0))],[f12,f13])).
+thf(f25,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[f24])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.023 s
+% Peak memory usage: 178 MB
+% Instructions burned: 20 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 21
+% clauses deleted: 7
+% -----------------------------
+% ------------------------------

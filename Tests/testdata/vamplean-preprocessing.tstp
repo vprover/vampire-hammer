@@ -1,0 +1,35 @@
+% Deterministic coverage for the direct VampLean preprocessing backend.
+%
+% The three input formulas exercise flattening (double-negation removal),
+% tautology removal, and NNF.  Their results then cross cnf_transformation.
+% The remaining nodes are ordinary resolution, so every transformed formula
+% contributes to the final contradiction.
+tff(type_t_a0, type, t_a0: $o).
+tff(type_t_a1, type, t_a1: $o).
+tff(type_t_a2, type, t_a2: $o).
+tff(type_t_a3, type, t_a3: $o).
+tff(f1, axiom, ((~ (~ t_a1))), file('<stdin>', 'fact1')).
+tff(f2, axiom, ((t_a2 | $false)), file('<stdin>', 'fact2')).
+tff(f3, axiom, ((~ (t_a1 & t_a2))), file('<stdin>', 'fact3')).
+tff(f4, plain, (t_a1),
+  inference(flattening, [], [f1])).
+tff(f5, plain, (t_a2),
+  inference(remove_tauto, [], [f2])).
+tff(f6, plain, (((~ t_a1) | (~ t_a2))),
+  inference(nnf_transformation, [], [f3])).
+tff(f7, plain, (t_a1),
+  inference(cnf_transformation, [], [f4])).
+tff(f8, plain, (t_a2),
+  inference(cnf_transformation, [], [f5])).
+tff(f9, plain, (((~ t_a1) | (~ t_a2))),
+  inference(cnf_transformation, [], [f6])).
+tff(f10, plain, ((~ t_a2)),
+  inference(resolution,
+    [unifier([subs(f9, []), subs(f7, [])]),
+     resolved_literals([literal(f9, 0), literal(f7, 0)])],
+    [f9, f7])).
+tff(f11, plain, ($false),
+  inference(resolution,
+    [unifier([subs(f8, []), subs(f10, [])]),
+     resolved_literals([literal(f8, 0), literal(f10, 0)])],
+    [f8, f10])).

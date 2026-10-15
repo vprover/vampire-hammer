@@ -1,0 +1,73 @@
+% Recorded Vampire output. The associativity_commutativity node for f11 and f12 was
+% added by hand, in the form Vampire prints for bridged inferences, because
+% this Vampire build does not yet bridge consistent_polarity_flipping.
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+tff(type_def_5, type, s_a0: $tType).
+tff(func_def_0, type, t_a3: s_a0).
+tff(pred_def_1, type, t_a0: s_a0 > $o).
+tff(pred_def_2, type, t_a1: s_a0 > $o).
+tff(pred_def_3, type, t_a2: s_a0 > $o).
+tff(f2,axiom,(
+  ! [X0 : s_a0] : (t_a0(X0) | t_a1(X0))),
+  file('<stdin>','fact1')).
+tff(f3,axiom,(
+  ! [X0 : s_a0] : (~t_a0(X0) | t_a2(X0))),
+  file('<stdin>','fact2')).
+tff(f4,axiom,(
+  ~t_a1(t_a3)),
+  file('<stdin>','fact3')).
+tff(f5,axiom,(
+  ~t_a2(t_a3)),
+  file('<stdin>','fact4')).
+tff(f7,plain,(
+  ( ! [X0 : s_a0] : (t_a0(X0) | t_a1(X0)) )),
+  inference(cnf_transformation,[],[f2])).
+tff(f8,plain,(
+  ( ! [X0 : s_a0] : (~t_a0(X0) | t_a2(X0)) )),
+  inference(cnf_transformation,[],[f3])).
+tff(f9,plain,(
+  ~t_a1(t_a3)),
+  inference(cnf_transformation,[],[f4])).
+tff(f10,plain,(
+  ~t_a2(t_a3)),
+  inference(cnf_transformation,[],[f5])).
+tff(f11_vh_consistent_polarity_flipping,plain,(
+  ( ! [X0 : s_a0] : (t_a0(X0) | ~t_a1(X0)) )),
+  inference(consistent_polarity_flipping,[],[f7])).
+tff(f11,plain,(
+  ( ! [X0 : s_a0] : (~t_a1(X0) | t_a0(X0)) )),
+  inference(associativity_commutativity,[permutation([1,0])],[f11_vh_consistent_polarity_flipping])).
+tff(f12_vh_consistent_polarity_flipping,plain,(
+  ( ! [X0 : s_a0] : (~t_a0(X0) | ~t_a2(X0)) )),
+  inference(consistent_polarity_flipping,[],[f8])).
+tff(f12,plain,(
+  ( ! [X0 : s_a0] : (~t_a2(X0) | ~t_a0(X0)) )),
+  inference(associativity_commutativity,[permutation([1,0])],[f12_vh_consistent_polarity_flipping])).
+tff(f13,plain,(
+  t_a1(t_a3)),
+  inference(consistent_polarity_flipping,[],[f9])).
+tff(f14,plain,(
+  t_a2(t_a3)),
+  inference(consistent_polarity_flipping,[],[f10])).
+tff(f15,plain,(
+  t_a0(t_a3)),
+  inference(resolution,[unifier([subs(f11,[b(X0,t_a3)]),subs(f13,[])]),resolved_literals([literal(f11,0),literal(f13,0)])],[f11,f13])).
+tff(f16,plain,(
+  ~t_a0(t_a3)),
+  inference(resolution,[unifier([subs(f12,[b(X0,t_a3)]),subs(f14,[])]),resolved_literals([literal(f12,0),literal(f14,0)])],[f12,f14])).
+tff(f17,plain,(
+  $false),
+  inference(forward_subsumption_resolution,[unifier([subs(f15,[])]),removed_literals(literal(f16,0))],[f16,f15])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit dd41db6ec on 2026-10-05 09:43:09 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.009 s
+% Peak memory usage: 116 MB
+% ------------------------------
+% ------------------------------

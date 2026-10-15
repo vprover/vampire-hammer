@@ -1,0 +1,91 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for boolean-clause
+% SZS output start Proof for boolean-clause
+thf(func_def_0, type, p: (($o > $o) > $o)).
+thf(func_def_1, type, q: (($o > $o) > $o)).
+thf(func_def_2, type, a: $o).
+thf(func_def_4, type, vOR: ($o > $o > $o)).
+thf(func_def_5, type, vAND: ($o > $o > $o)).
+thf(func_def_6, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_7, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_10, type, vEQ: !>[X0: $tType]:((X0 > X0 > $o))).
+thf(func_def_11, type, vNOT: ($o > $o)).
+thf(f1,axiom,(
+  (((q @ (^[X0 : $o] : (X0))) & (p @ (^[X0 : $o] : (X0)))) = ($true)) | a),
+  file('Tests/testdata/higher-order/boolean-clause.p','pos')).
+thf(f2,axiom,(
+  ~a),
+  file('Tests/testdata/higher-order/boolean-clause.p','neg_a')).
+thf(f3,axiom,(
+  ~(p @ (^[X0 : $o] : (X0)))),
+  file('Tests/testdata/higher-order/boolean-clause.p','neg_p')).
+thf(f4,plain,(
+  (((q @ (^[X0 : $o] : (X0))) & (p @ (^[X1 : $o] : (X1)))) = ($true)) | a),
+  inference(rectify,[],[f1])).
+thf(f5,plain,(
+  ($true = ((a | (((p @ (^[Y0 : $o]: (Y0))) & (q @ (^[Y0 : $o]: (Y0)))) = $true))))),
+  inference(fool_elimination,[],[f4])).
+thf(f6,plain,(
+  ~a),
+  inference(rectify,[],[f2])).
+thf(f7,plain,(
+  ($true = ((~ a)))),
+  inference(fool_elimination,[],[f6])).
+thf(f8,plain,(
+  ~(p @ (^[X0 : $o] : (X0)))),
+  inference(rectify,[],[f3])).
+thf(f9,plain,(
+  ($true = ((~ (p @ (^[Y0 : $o]: (Y0))))))),
+  inference(fool_elimination,[],[f8])).
+thf(f10,plain,(
+  ($true = ((a | (((p @ (^[Y0 : $o]: (Y0))) & (q @ (^[Y0 : $o]: (Y0)))) = $true))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f5])).
+thf(f11,plain,(
+  ($true = ((~ a)))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f7])).
+thf(f12,plain,(
+  ($true = ((~ (p @ (^[Y0 : $o]: (Y0))))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f9])).
+thf(f15,plain,(
+  (((p @ (^[Y0 : $o]: (Y0)))) = $false)),
+  inference(not_proxy_clausification,[],[f12])).
+thf(f16,plain,(
+  (a = $false)),
+  inference(not_proxy_clausification,[],[f11])).
+thf(f17,plain,(
+  ($true = ((((p @ (^[Y0 : $o]: (Y0))) & (q @ (^[Y0 : $o]: (Y0)))) = $true))) | (a = $true)),
+  inference(or_proxy_clausification,[],[f10])).
+thf(f18,plain,(
+  ($true = ((($false & (q @ (^[Y0 : $o]: (Y0)))) = $true))) | (a = $true)),
+  inference(forward_demodulation,[unifier([subs(f17,[]),subs(f15,[])]),rewritten_literal(literal(f17,0))],[f17,f15])).
+thf(f19,plain,(
+  ($true = (($false = $true))) | (a = $true)),
+  inference(boolean_simplification,[],[f18])).
+thf(f20_vh_forward_demodulation,plain,(
+  ($true = (($false = $true))) | ($true = $false)),
+  inference(forward_demodulation,[unifier([subs(f19,[]),subs(f16,[])]),rewritten_literal(literal(f19,1))],[f19,f16])).
+thf(f20,plain,(
+  ($true = $false) | ($true = (($false = $true)))),
+  inference(associativity_commutativity,[permutation([1,0])],[f20_vh_forward_demodulation])).
+thf(f21,plain,(
+  ($true = (($false = $true)))),
+  inference(trivial_inequality_removal,[],[f20])).
+thf(f22,plain,(
+  ($true = $false)),
+  inference(equality_proxy_clausification,[],[f21])).
+thf(f23,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[f22])).
+% SZS output end Proof for boolean-clause
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.0000 s
+% Peak memory usage: 11 MB
+% Instructions burned: 1 (million)
+% ------------------------------
+% ------------------------------

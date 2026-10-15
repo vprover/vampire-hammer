@@ -1,0 +1,64 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% WARNING Broken Constraint: if shuffle_on_schedule_repeats(off) has been set then mode(vampire) is equal to cascormode(vampire) is equal to smtcompormode(vampire) is equal to portfolio
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+thf(type_def_5, type, s_a0: $tType).
+thf(func_def_0, type, vNOT: ($o > $o)).
+thf(func_def_2, type, vSIGMA: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_3, type, vPI: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_4, type, db1: !>[X0: $tType]:(X0)).
+thf(func_def_5, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_6, type, vEQ: !>[X0: $tType]:((X0 > X0 > $o))).
+thf(func_def_7, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_10, type, sK0: ((s_a0 > s_a0) > s_a0)).
+thf(func_def_11, type, db2: !>[X0: $tType]:(X0)).
+thf(f1,axiom,(
+  (~ (? [X0 : (s_a0 > s_a0)] : ! [X1 : s_a0] : (((X0 @ X1)) = X1)))),
+  file('<stdin>','fact0')).
+thf(f2,plain,(
+  (~ (? [X0 : (s_a0 > s_a0)] : ! [X1 : s_a0] : (((X0 @ X1)) = X1)))),
+  inference(rectify,[],[f1])).
+thf(f3,plain,(
+  (((~ (?? @ (s_a0 > s_a0) @ (^[Y0 : s_a0 > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = Y1))))))) = $true)),
+  inference(fool_elimination,[],[f2])).
+thf(f4,plain,(
+  (((~ (?? @ (s_a0 > s_a0) @ (^[Y0 : s_a0 > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = Y1))))))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f3])).
+thf(f7,plain,(
+  (((?? @ (s_a0 > s_a0) @ (^[Y0 : s_a0 > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = Y1)))))) = $false)),
+  inference(not_proxy_clausification,[],[f4])).
+thf(f8,plain,(
+  ( ! [X1 : (s_a0 > s_a0)] : (($false = (((^[Y0 : s_a0 > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = Y1)))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f7])).
+thf(f9,plain,(
+  ( ! [X1 : (s_a0 > s_a0)] : (($false = ((!! @ s_a0 @ (^[Y0 : s_a0]: ((X1 @ Y0) = Y0)))))) )),
+  inference('beta-eta_normalization',[],[f8])).
+thf(f10,plain,(
+  ( ! [X1 : (s_a0 > s_a0)] : (($false = (((^[Y0 : s_a0]: ((X1 @ Y0) = Y0)) @ (sK0 @ X1))))) )),
+  inference(sigma_proxy_clausification,[new_symbols(skolem,[sK0]),quantifier_witness(literal(f9,0),sK0,[X1])],[f9])).
+thf(f11,plain,(
+  ( ! [X1 : (s_a0 > s_a0)] : (($false = (((X1 @ (sK0 @ X1)) = (sK0 @ X1))))) )),
+  inference('beta-eta_normalization',[],[f10])).
+thf(f12,plain,(
+  ( ! [X1 : (s_a0 > s_a0)] : ((((sK0 @ X1)) != ((X1 @ (sK0 @ X1))))) )),
+  inference(equality_proxy_clausification,[],[f11])).
+thf(f20,plain,(
+  $false),
+  inference(equality_resolution,[unifier([subs(f12,[b(X1,$thf((^[Y0 : s_a0]: (Y0))))])])],[f12])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.008 s
+% Peak memory usage: 184 MB
+% Instructions burned: 30 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 22
+% clauses deleted: 9
+% -----------------------------
+% ------------------------------

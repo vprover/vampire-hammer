@@ -1,0 +1,99 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% WARNING Broken Constraint: if shuffle_on_schedule_repeats(off) has been set then mode(vampire) is equal to cascormode(vampire) is equal to smtcompormode(vampire) is equal to portfolio
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+thf(func_def_0, type, t_a0: ($o > $o)).
+thf(func_def_1, type, t_a1: $o).
+thf(func_def_2, type, vNOT: ($o > $o)).
+thf(f1,axiom,(
+  (~ (t_a0 @ t_a1))),
+  file('<stdin>','fact0')).
+thf(f2,axiom,(
+  (t_a0 @ ($true))),
+  file('<stdin>','fact1')).
+thf(f3,axiom,(
+  (t_a0 @ ($false))),
+  file('<stdin>','fact2')).
+thf(f4,plain,(
+  (~ (t_a0 @ t_a1))),
+  inference(rectify,[],[f1])).
+thf(f5,plain,(
+  (((~ (t_a0 @ t_a1))) = $true)),
+  inference(fool_elimination,[],[f4])).
+thf(f6,plain,(
+  (t_a0 @ ($true))),
+  inference(rectify,[],[f2])).
+thf(f7,plain,(
+  ($true = ((t_a0 @ $true)))),
+  inference(fool_elimination,[],[f6])).
+thf(f8,plain,(
+  (t_a0 @ ($false))),
+  inference(rectify,[],[f3])).
+thf(f9,plain,(
+  ($true = ((t_a0 @ $false)))),
+  inference(fool_elimination,[],[f8])).
+thf(f10,plain,(
+  (((~ (t_a0 @ t_a1))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f5])).
+thf(f11,plain,(
+  ($true = ((t_a0 @ $true)))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f7])).
+thf(f12,plain,(
+  ($true = ((t_a0 @ $false)))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f9])).
+thf(f17,plain,(
+  ($true = ((~ $true))) | (((t_a0 @ t_a1)) = $false)),
+  inference(cases_simplifying,[boolean_case(literal(f10,0),$thf((t_a0 @ t_a1)),true)],[f10])).
+thf(f23,plain,(
+  ($true = ((~ $true))) | (((t_a0 @ $true)) = $false) | (t_a1 = $false)),
+  inference(cases_simplifying,[boolean_case(literal(f17,1),$thf(t_a1),true)],[f17])).
+thf(f24,plain,(
+  ($true = ((~ $true))) | ($false = ((t_a0 @ $false))) | (t_a1 = $true)),
+  inference(cases_simplifying,[boolean_case(literal(f17,1),$thf(t_a1),false)],[f17])).
+thf(f25,plain,(
+  ($true = $false) | ($false = ((t_a0 @ $false))) | (t_a1 = $true)),
+  inference(boolean_simplification,[],[f24])).
+thf(f26,plain,(
+  ($false = ((t_a0 @ $false))) | (t_a1 = $true)),
+  inference(trivial_inequality_removal,[],[f25])).
+thf(f27,plain,(
+  ($true = $false) | (((t_a0 @ $true)) = $false) | (t_a1 = $false)),
+  inference(boolean_simplification,[],[f23])).
+thf(f28,plain,(
+  (((t_a0 @ $true)) = $false) | (t_a1 = $false)),
+  inference(trivial_inequality_removal,[],[f27])).
+thf(f39,plain,(
+  ($true = $false) | (t_a1 = $true)),
+  inference(forward_demodulation,[unifier([subs(f26,[]),subs(f12,[])]),rewritten_literal(literal(f26,0))],[f26,f12])).
+thf(f40,plain,(
+  (t_a1 = $true)),
+  inference(trivial_inequality_removal,[],[f39])).
+thf(f41,plain,(
+  ($true = $false) | (t_a1 = $false)),
+  inference(forward_demodulation,[unifier([subs(f28,[]),subs(f11,[])]),rewritten_literal(literal(f28,0))],[f28,f11])).
+thf(f42,plain,(
+  (t_a1 = $false)),
+  inference(trivial_inequality_removal,[],[f41])).
+thf(f48,plain,(
+  ($true = $false)),
+  inference(constrained_superposition,[unifier([subs(f42,[]),subs(f40,[])]),constraints([]),rewrite([equality(literal(f40,0)),from($thf(t_a1)),to($thf($true))]),rewritten_literal(literal(f42,0))],[f40,f42])).
+thf(f49,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[f48])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.008 s
+% Peak memory usage: 181 MB
+% Instructions burned: 23 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 44
+% clauses deleted: 21
+% -----------------------------
+% ------------------------------

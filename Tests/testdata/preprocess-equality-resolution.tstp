@@ -1,0 +1,14 @@
+% Equality resolution deletes the instantiated first literal. Its natural
+% parent-tail order is p(X0) | r(X1), while Vampire displays r(X1) | p(X0).
+% Preprocessing must therefore insert an explicit AC bridge after the core.
+tff(type_s, type, s: $tType).
+tff(type_f, type, f: s > s).
+tff(type_p, type, p: s > $o).
+tff(type_r, type, r: s > $o).
+tff(f_parent, plain, (
+  ! [X0 : s, X1 : s, X2 : s] : (X2 != f(X1) | p(X0) | r(X1))),
+  inference(cnf_transformation, [], [])).
+tff(f_child, plain, (
+  ! [X0 : s, X1 : s] : (r(X1) | p(X0))),
+  inference(equality_resolution,
+    [unifier([subs(f_parent, [b(X2, f(X1))])])], [f_parent])).

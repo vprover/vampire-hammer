@@ -1,0 +1,4 @@
+% A predicate with arguments must still have a checked domain declaration.
+tff(d0,definition,(! [X0 : s_a0] : (t_a0(X0) | ~sP0(X0))),
+    introduced(definition,[new_symbols(definition,[sP0])],
+        [predicate_definition_introduction])).

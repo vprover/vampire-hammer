@@ -1,0 +1,21 @@
+% Synthetic suffix of quantifier-subset.frozen.stdout, preserving the side
+% literal during witness introduction and requesting arguments [X1,X0].
+thf(i_type,type,i:$tType).
+thf(p_type,type,p:i>i>i>$o).
+thf(side_type,type,side:i>$o).
+thf(sk_type,type,sK0:i>i>i).
+thf(f1,axiom,![X0:i,X1:i,X2:i]:((side @ X2) | ((? [T:i]:(p @ X0 @ X1 @ T)) = $true)),file('quantifier-subset.p',ex)).
+thf(f2,axiom,![X0:i,X1:i,X2:i]:~(p @ X0 @ X1 @ X2),file('quantifier-subset.p',neg)).
+thf(f3,axiom,![X2:i]:~(side @ X2),file('quantifier-subset.p',neg_side)).
+thf(f2c,plain,![X0:i,X1:i,X2:i]:~(p @ X0 @ X1 @ X2),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0),b(X1,X1),b(X2,X2)]),literal_permutation([0]),swapped_equalities([])],[f2])).
+thf(f3c,plain,![X2:i]:~(side @ X2),
+  inference(cnf_transformation,[binder_mapping([b(X2,X2)]),literal_permutation([0]),swapped_equalities([])],[f3])).
+thf(f4,plain,![X0:i,X1:i,X2:i]:((side @ X2) | ((? [T:i]:(p @ X0 @ X1 @ T)) = $true)),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0),b(X1,X1),b(X2,X2)]),literal_permutation([0,1]),swapped_equalities([])],[f1])).
+thf(f5,plain,![X0:i,X1:i,X2:i]:((side @ X2) | (p @ X0 @ X1 @ (sK0 @ X1 @ X0))),
+  inference(sigma_proxy_clausification,[new_symbols(skolem,[sK0]),quantifier_witness(literal(f4,1),sK0,[X1,X0])],[f4])).
+thf(f6,plain,![X0:i,X1:i,X2:i]:(side @ X2),
+  inference(forward_subsumption_resolution,[unifier([subs(f2c,[b(X0,X0),b(X1,X1),b(X2,$thf(sK0 @ X1 @ X0))])]),removed_literals(literal(f5,1))],[f5,f2c])).
+thf(f7,plain,$false,
+  inference(forward_subsumption_resolution,[unifier([subs(f3c,[b(X2,X2)])]),removed_literals(literal(f6,0))],[f6,f3c])).

@@ -1,0 +1,50 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for leibniz
+% SZS output start Proof for leibniz
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, a: i).
+thf(func_def_1, type, b: i).
+thf(func_def_5, type, vNOT: ($o > $o)).
+thf(func_def_6, type, vEQ: !>[X0: $tType]:((X0 > X0 > $o))).
+thf(func_def_7, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_8, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(f1,axiom,(
+  ! [X0 : (i > $o)] : (~(X0 @ b) | (X0 @ a))),
+  file('Tests/testdata/higher-order/leibniz.p','all')).
+thf(f2,axiom,(
+  (a != b)),
+  file('Tests/testdata/higher-order/leibniz.p','neg')).
+thf(f3,plain,(
+  ! [X0 : (i > $o)] : (~(X0 @ b) | (X0 @ a))),
+  inference(rectify,[],[f1])).
+thf(f4,plain,(
+  ! [X0 : (i > $o)] : (~ (((X0 @ b)) = $true) | (((X0 @ a)) = $true))),
+  inference(fool_elimination,[],[f3])).
+thf(f5,plain,(
+  ! [X0 : (i > $o)] : ((((X0 @ b)) != $true) | (((X0 @ a)) = $true))),
+  inference(flattening,[],[f4])).
+thf(f6,plain,(
+  ( ! [X0 : (i > $o)] : ((((X0 @ b)) != $true) | (((X0 @ a)) = $true)) )),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0)]),literal_permutation([0,1]),swapped_equalities([])],[f5])).
+thf(f7,plain,(
+  (a != b)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f2])).
+thf(f18,plain,(
+  (a = b)),
+  inference(leibniz_equality_elimination,[],[f6])).
+thf(f33,plain,(
+  $false),
+  inference(forward_subsumption_resolution,[unifier([subs(f7,[])]),removed_literals(literal(f18,0))],[f18,f7])).
+% SZS output end Proof for leibniz
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.001 s
+% Peak memory usage: 11 MB
+% Instructions burned: 1 (million)
+% ------------------------------
+% ------------------------------

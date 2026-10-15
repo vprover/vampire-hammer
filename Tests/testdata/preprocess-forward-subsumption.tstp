@@ -1,0 +1,11 @@
+% Removing b naturally leaves a | c, but Vampire displays c | a. The pass must
+% introduce a distinct forward-subsumption core followed by an AC bridge.
+tff(type_a, type, a: $o).
+tff(type_b, type, b: $o).
+tff(type_c, type, c: $o).
+tff(p, axiom, (a | b | c), file('<stdin>', 'fact0')).
+tff(n, axiom, (~ b), file('<stdin>', 'fact1')).
+tff(r, plain, (c | a),
+  inference(forward_subsumption_resolution,
+    [unifier([]),removed_literals(literal(p, 1))],
+    [p, n])).

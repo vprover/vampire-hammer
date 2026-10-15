@@ -1,0 +1,8 @@
+% The root cites left and right; left also cites right. A pending sibling
+% must not be mistaken for an active ancestor while ordering this proof.
+tff(type_p, type, t_a0: $o).
+tff(root, plain, $false,
+  inference(test_shared_refutation, [], [left, right, negative])).
+tff(left, plain, t_a0, inference(rectify, [], [right])).
+tff(right, axiom, t_a0, file('<stdin>', fact1)).
+tff(negative, axiom, (~ t_a0), file('<stdin>', fact2)).

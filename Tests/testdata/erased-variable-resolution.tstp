@@ -1,0 +1,33 @@
+% A direct-resolution fixture where the resolved variable disappears from the
+% child. Vampire is allowed to print the identity unifier as two empty parent
+% substitutions: both parent-local `X0`s still denote the same unifier
+% variable. Replay must give them one shared Lean value before applying the
+% two universally quantified parent proofs.
+tff(type_s_a0, type, s_a0: $tType).
+tff(type_t_a0, type, t_a0: $o).
+tff(type_t_a1, type, t_a1: (s_a0 > $o)).
+tff(f0, axiom, (~ t_a0), file('<stdin>', 'fact0')).
+tff(f1, axiom, (
+  ! [X0 : s_a0] : (t_a1(X0) | t_a0)),
+  file('<stdin>', 'fact1')).
+tff(f2, axiom, (
+  ! [X0 : s_a0] : (~ t_a1(X0))),
+  file('<stdin>', 'fact2')).
+tff(f0c, plain, (~ t_a0),
+  inference(cnf_transformation, [], [f0])).
+tff(f1c, plain, (
+  ! [X0 : s_a0] : (t_a1(X0) | t_a0)),
+  inference(cnf_transformation, [], [f1])).
+tff(f2c, plain, (
+  ! [X0 : s_a0] : (~ t_a1(X0))),
+  inference(cnf_transformation, [], [f2])).
+tff(f3, plain, (t_a0),
+  inference(resolution,
+    [unifier([subs(f1c, []), subs(f2c, [])]),
+     resolved_literals([literal(f1c, 0), literal(f2c, 0)])],
+    [f1c, f2c])).
+tff(f4, plain, ($false),
+  inference(resolution,
+    [unifier([subs(f3, []), subs(f0c, [])]),
+     resolved_literals([literal(f3, 0), literal(f0c, 0)])],
+    [f3, f0c])).

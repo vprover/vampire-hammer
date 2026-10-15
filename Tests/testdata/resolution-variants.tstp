@@ -1,0 +1,122 @@
+% Deterministic coverage for the resolution variants in Backend/Resolution.lean
+% and condensation in Backend/Factoring.lean. Certificates follow the shapes
+% printed by Vampire's TPTPReplayAnnotations. Inputs f1-f18 are clausified as
+% f21-f38; f41-f48 use one rule each, and the final step is a deliberately
+% unknown rule, so only f41-f48 exercise the new handlers.
+tff(type_s_a0, type, s_a0: $tType).
+tff(type_t_a0, type, t_a0: (s_a0 > $o)).
+tff(type_t_a1, type, t_a1: (s_a0 > $o)).
+tff(type_t_a2, type, t_a2: (s_a0 > $o)).
+tff(type_t_a3, type, t_a3: s_a0).
+tff(type_t_a4, type, t_a4: (s_a0 > $o)).
+tff(type_t_a5, type, t_a5: (s_a0 > $o)).
+tff(type_t_a6, type, t_a6: $o).
+tff(type_t_a7, type, t_a7: (s_a0 > $o)).
+tff(type_t_a8, type, t_a8: ((s_a0 * s_a0) > $o)).
+tff(type_t_a9, type, t_a9: s_a0).
+tff(type_t_a10, type, t_a10: (s_a0 > $o)).
+tff(type_t_a11, type, t_a11: (s_a0 > $o)).
+tff(type_t_a12, type, t_a12: (s_a0 > s_a0)).
+tff(f1, axiom, (! [X0: s_a0] : ((~ t_a0(X0)) | ((~ t_a1(X0)) | t_a2(X0)))), file('<stdin>', 'fact1')).
+tff(f2, axiom, t_a0(t_a3), file('<stdin>', 'fact2')).
+tff(f3, axiom, t_a1(t_a3), file('<stdin>', 'fact3')).
+tff(f4, axiom, (~ t_a2(t_a3)), file('<stdin>', 'fact4')).
+tff(f5, axiom, (! [X0: s_a0] : (t_a4(X0) | t_a4(t_a3))), file('<stdin>', 'fact5')).
+tff(f7, axiom, (t_a5(t_a3) | t_a6), file('<stdin>', 'fact7')).
+tff(f8, axiom, (! [X0: s_a0] : ((~ t_a5(X0)) | t_a7(X0))), file('<stdin>', 'fact8')).
+tff(f11, axiom, (! [X0: s_a0] : (! [X1: s_a0] : ((X0 = X1) | (~ t_a8(X0, X1))))), file('<stdin>', 'fact11')).
+tff(f12, axiom, (~ (t_a3 = t_a9)), file('<stdin>', 'fact12')).
+tff(f14, axiom, (! [X0: s_a0] : (~ t_a5(X0))), file('<stdin>', 'fact14')).
+tff(f15, axiom, (! [X0: s_a0] : ((~ (X0 = t_a3)) | t_a10(X0))), file('<stdin>', 'fact15')).
+tff(f17, axiom, t_a11(t_a12(t_a3)), file('<stdin>', 'fact17')).
+tff(f18, axiom, (~ t_a11(t_a9)), file('<stdin>', 'fact18')).
+tff(f20, axiom, (~ t_a11(t_a12(t_a12(t_a3)))), file('<stdin>', 'fact20')).
+tff(f21, plain, (! [X0: s_a0] : (~ t_a0(X0) | ~ t_a1(X0) | t_a2(X0))),
+  inference(cnf_transformation, [], [f1])).
+tff(f22, plain, (t_a0(t_a3)),
+  inference(cnf_transformation, [], [f2])).
+tff(f23, plain, (t_a1(t_a3)),
+  inference(cnf_transformation, [], [f3])).
+tff(f24, plain, (~ t_a2(t_a3)),
+  inference(cnf_transformation, [], [f4])).
+tff(f25, plain, (! [X0: s_a0] : (t_a4(X0) | t_a4(t_a3))),
+  inference(cnf_transformation, [], [f5])).
+tff(f27, plain, (t_a5(t_a3) | t_a6),
+  inference(cnf_transformation, [], [f7])).
+tff(f28, plain, (! [X0: s_a0] : (~ t_a5(X0) | t_a7(X0))),
+  inference(cnf_transformation, [], [f8])).
+tff(f31, plain, (! [X0: s_a0, X1: s_a0] : (X0 = X1 | ~ t_a8(X0, X1))),
+  inference(cnf_transformation, [], [f11])).
+tff(f32, plain, (t_a3 != t_a9),
+  inference(cnf_transformation, [], [f12])).
+tff(f34, plain, (! [X0: s_a0] : ~ t_a5(X0)),
+  inference(cnf_transformation, [], [f14])).
+tff(f35, plain, (! [X0: s_a0] : (X0 != t_a3 | t_a10(X0))),
+  inference(cnf_transformation, [], [f15])).
+tff(f37, plain, (t_a11(t_a12(t_a3))),
+  inference(cnf_transformation, [], [f17])).
+tff(f38, plain, (~ t_a11(t_a9)),
+  inference(cnf_transformation, [], [f18])).
+tff(f41, plain, (t_a2(t_a3)),
+  inference(unit_resulting_resolution,
+    [unifier([subs(f21,[b(X0,t_a3)]),subs(f22,[]),subs(f23,[])]),
+     resolved_literals([literal(f21,0),literal(f22,0),literal(f21,1),literal(f23,0)])],
+    [f21, f22, f23])).
+tff(f43, plain, (t_a4(t_a3)),
+  inference(condensation,
+    [unifier([subs(f25,[b(X0,t_a3)])]),removed_literals(literal(f25,1))],
+    [f25])).
+tff(f44, plain, (t_a7(t_a3) | t_a6),
+  inference(forward_literal_rewriting,
+    [unifier([subs(f27,[]),subs(f28,[b(X0,t_a3)])]),
+     rewritten_literal(literal(f27,0)),
+     resolved_literals([literal(f27,0),literal(f28,0)])],
+    [f27, f28])).
+tff(f45, plain, (~ t_a8(t_a3, t_a9)),
+  inference(extensionality_resolution,
+    [unifier([subs(f31,[b(X0,t_a3),b(X1,t_a9)]),subs(f32,[])]),
+     resolved_literals([literal(f31,0),literal(f32,0)])],
+    [f31, f32])).
+tff(f46, plain, (t_a6),
+  inference(backward_subsumption_resolution,
+    [unifier([subs(f34,[b(X0,t_a3)])]),removed_literals(literal(f27,0))],
+    [f27, f34])).
+tff(f47, plain, (t_a10(t_a3)),
+  inference(subsumption_equality_resolution,
+    [unifier([subs(f35,[b(X0,t_a3)])]),removed_literals(literal(f35,0))],
+    [f35])).
+tff(f48, plain, (t_a12(t_a3) != t_a9),
+  inference(constrained_resolution,
+    [unifier([subs(f37,[]),subs(f38,[])]),
+     constraints([disequality(s_a0,t_a12(t_a3),t_a9)]),
+     resolved_literals([literal(f37,0),literal(f38,0)])],
+    [f37, f38])).
+tff(f40, plain, (~ t_a11(t_a12(t_a12(t_a3)))),
+  inference(cnf_transformation, [], [f20])).
+% The constraint's right side contains its left side, below a function symbol.
+tff(f49, plain, (t_a3 != t_a12(t_a3)),
+  inference(constrained_resolution,
+    [unifier([subs(f37,[]),subs(f40,[])]),
+     constraints([disequality(s_a0,t_a3,t_a12(t_a3))]),
+     resolved_literals([literal(f37,0),literal(f40,0)])],
+    [f37, f40])).
+% The negative parent first; the constraint is oriented the other way.
+tff(f51, plain, (t_a12(t_a3) != t_a3),
+  inference(constrained_resolution,
+    [unifier([subs(f40,[]),subs(f37,[])]),
+     constraints([disequality(s_a0,t_a12(t_a3),t_a3)]),
+     resolved_literals([literal(f40,0),literal(f37,0)])],
+    [f40, f37])).
+% An A-clause parent: its AVATAR literal is carried to the conclusion.
+tff(f52, definition, (spl0_1 <=> $true),
+  introduced(definition,[new_symbols(definition,[spl0_1])],[avatar_definition])).
+tff(f53, plain, (t_a11(t_a12(t_a3)) | ~spl0_1),
+  inference(cnf_transformation, [], [f17])).
+tff(f54, plain, (t_a12(t_a3) != t_a9 | ~spl0_1),
+  inference(constrained_resolution,
+    [unifier([subs(f53,[]),subs(f38,[])]),
+     constraints([disequality(s_a0,t_a12(t_a3),t_a9)]),
+     resolved_literals([literal(f53,0),literal(f38,0)])],
+    [f53, f38])).
+tff(f60, plain, ($false),
+  inference(contradiction, [], [f41, f24, f43, f44, f45, f46, f47, f48, f49, f51, f54])).

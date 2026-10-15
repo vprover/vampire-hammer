@@ -1,0 +1,67 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for ho-occurrence
+% SZS output start Proof for ho-occurrence
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, g: (i > i)).
+thf(func_def_1, type, h: (i > i)).
+thf(func_def_2, type, q: ((i > i) > (i > i) > $o)).
+thf(func_def_4, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_5, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_8, type, vNOT: ($o > $o)).
+thf(f1,axiom,(
+  (g = h)),
+  file('/tmp/ho-occurrence.p','eq')).
+thf(f2,axiom,(
+  (q @ (^[X0 : i] : ((g @ X0))) @ (^[X0 : i] : ((g @ X0))))),
+  file('/tmp/ho-occurrence.p','pos')).
+thf(f3,axiom,(
+  ~(q @ (^[X0 : i] : ((h @ X0))) @ (^[X0 : i] : ((h @ X0))))),
+  file('/tmp/ho-occurrence.p','neg')).
+thf(f4,plain,(
+  (q @ (^[X0 : i] : ((g @ X0))) @ (^[X1 : i] : ((g @ X1))))),
+  inference(rectify,[],[f2])).
+thf(f5,plain,(
+  (((q @ (^[Y0 : i]: (g @ Y0)) @ (^[Y0 : i]: (g @ Y0)))) = $true)),
+  inference(fool_elimination,[],[f4])).
+thf(f6,plain,(
+  ~(q @ (^[X0 : i] : ((h @ X0))) @ (^[X1 : i] : ((h @ X1))))),
+  inference(rectify,[],[f3])).
+thf(f7,plain,(
+  ~ ($true = ((q @ (^[Y0 : i]: (h @ Y0)) @ (^[Y0 : i]: (h @ Y0)))))),
+  inference(fool_elimination,[],[f6])).
+thf(f8,plain,(
+  ($true != ((q @ (^[Y0 : i]: (h @ Y0)) @ (^[Y0 : i]: (h @ Y0)))))),
+  inference(flattening,[],[f7])).
+thf(f9,plain,(
+  (g = h)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f1])).
+thf(f10,plain,(
+  (((q @ (^[Y0 : i]: (g @ Y0)) @ (^[Y0 : i]: (g @ Y0)))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f5])).
+thf(f11,plain,(
+  ($true != ((q @ (^[Y0 : i]: (h @ Y0)) @ (^[Y0 : i]: (h @ Y0)))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f8])).
+thf(f14,plain,(
+  ($true = ((q @ (^[Y0 : i]: (h @ Y0)) @ (^[Y0 : i]: (h @ Y0)))))),
+  inference(definition_unfolding,[],[f10,f9,f9])).
+thf(f15,plain,(
+  ($true != ((q @ h @ h)))),
+  inference(beta-eta_normalization,[],[f11])).
+thf(f16,plain,(
+  ($true = ((q @ h @ h)))),
+  inference(beta-eta_normalization,[],[f14])).
+thf(f17,plain,(
+  $false),
+  inference(forward_subsumption_resolution,[unifier([subs(f15,[])]),removed_literals(literal(f16,0))],[f16,f15])).
+% SZS output end Proof for ho-occurrence
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.011 s
+% Peak memory usage: 11 MB
+% ------------------------------
+% ------------------------------

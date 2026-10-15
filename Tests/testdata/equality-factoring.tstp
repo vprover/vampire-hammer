@@ -1,0 +1,65 @@
+% Equality factoring with a variable-to-variable mgu.  The selected equality
+% f(X0) = a is unified with the left side of f(X1) = b by X1 |-> X0.
+tff(type_def_0, type, s_a0: $tType).
+tff(func_def_0, type, t_a0: (s_a0 > s_a0)).
+tff(func_def_1, type, t_a1: s_a0).
+tff(func_def_2, type, t_a2: s_a0).
+tff(pred_def_3, type, t_a3: (s_a0 > $o)).
+tff(pred_def_4, type, t_a4: ((s_a0 * s_a0) > $o)).
+tff(func_def_5, type, t_a5: s_a0).
+tff(f1,axiom,(
+  ! [X0 : s_a0, X1 : s_a0] :
+    (t_a0(X0) = t_a1 | t_a0(X1) = t_a2 | t_a3(X1))),
+  file('<stdin>','fact1')).
+tff(f2,axiom,(
+  ~t_a4(t_a1,t_a2) | t_a1 = t_a2),
+  file('<stdin>','fact2')).
+tff(f3,axiom,(
+  t_a4(t_a1,t_a2)),
+  file('<stdin>','fact3')).
+tff(f4,axiom,(
+  t_a0(t_a5) != t_a2),
+  file('<stdin>','fact4')).
+tff(f5,axiom,(
+  ~t_a3(t_a5)),
+  file('<stdin>','fact5')).
+tff(f6,plain,(
+  ! [X0 : s_a0, X1 : s_a0] :
+    (t_a0(X0) = t_a1 | t_a0(X1) = t_a2 | t_a3(X1))),
+  inference(cnf_transformation,[],[f1])).
+tff(f7,plain,(
+  ~t_a4(t_a1,t_a2) | t_a1 = t_a2),
+  inference(cnf_transformation,[],[f2])).
+tff(f8,plain,(
+  t_a4(t_a1,t_a2)),
+  inference(cnf_transformation,[],[f3])).
+tff(f9,plain,(
+  t_a0(t_a5) != t_a2),
+  inference(cnf_transformation,[],[f4])).
+tff(f10,plain,(
+  ~t_a3(t_a5)),
+  inference(cnf_transformation,[],[f5])).
+tff(f11,plain,(
+  t_a1 = t_a2),
+  inference(resolution,
+    [unifier([subs(f7,[]),subs(f8,[])]),
+     resolved_literals([literal(f7,0),literal(f8,0)])],[f7,f8])).
+tff(f12,plain,(
+  ! [X0 : s_a0] :
+    (t_a1 != t_a2 | t_a0(X0) = t_a2 | t_a3(X0))),
+  inference(equality_factoring,
+    [unifier([subs(f6,[b(X1,X0)])])],[f6])).
+tff(f13,plain,(
+  ! [X0 : s_a0] :
+    (t_a0(X0) = t_a2 | t_a3(X0))),
+  inference(forward_subsumption_resolution,
+    [unifier([]),resolved_literals([literal(f12,0),literal(f11,0)])],[f12,f11])).
+tff(f14,plain,(
+  t_a3(t_a5)),
+  inference(resolution,
+    [unifier([subs(f13,[b(X0,t_a5)]),subs(f9,[])]),
+     resolved_literals([literal(f13,0),literal(f9,0)])],[f13,f9])).
+tff(f15,plain,(
+  $false),
+  inference(forward_subsumption_resolution,
+    [unifier([]),resolved_literals([literal(f14,0),literal(f10,0)])],[f14,f10])).

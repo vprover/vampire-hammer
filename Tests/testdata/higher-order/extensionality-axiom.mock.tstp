@@ -1,0 +1,44 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for ext
+% SZS output start Proof for ext
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, f: (i > i)).
+thf(func_def_1, type, g: (i > i)).
+thf(diff_type,type,d:((i>i)>(i>i)>i)).
+thf(f1,axiom,(
+  ! [X0 : i] : (((f @ X0)) = ((g @ X0)))),
+  file('/tmp/tptp-ho-scope/ext.p','pointwise')).
+thf(f2,axiom,(
+  (f != g)),
+  file('/tmp/tptp-ho-scope/ext.p','neg')).
+thf(f3,plain,(
+  ( ! [X0 : i] : ((((f @ X0)) = ((g @ X0)))) )),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0)]),literal_permutation([0]),swapped_equalities([])],[f1])).
+thf(f4,plain,(
+  (f != g)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f2])).
+% Synthetic global extensionality suffix of the real pointwise proof.
+thf(fax,plain,(
+  ![F:(i>i),G:(i>i)]: (((F @ (d @ F @ G)) != (G @ (d @ F @ G))) | (F = G))),
+  inference(functional_extensionality_axiom,[new_symbols(extensionality,[d]),extensionality_axiom(d,F,G)],[])).
+thf(fax2,plain,(
+  ![F:(i>i),G:(i>i)]: (((F @ (d @ F @ G)) != (G @ (d @ F @ G))) | (F = G))),
+  inference(functional_extensionality_axiom,[extensionality_axiom(d,F,G)],[])).
+thf(feq,plain,(
+  (f = g)),
+  inference(resolution,[unifier([subs(fax2,[b(F,$thf(f)),b(G,$thf(g))]),subs(f3,[b(X0,$thf(d @ f @ g))])]),resolved_literals([literal(fax2,0),literal(f3,0)])],[fax2,f3])).
+thf(fend,plain,(
+  $false),
+  inference(resolution,[unifier([subs(feq,[]),subs(f4,[])]),resolved_literals([literal(feq,0),literal(f4,0)])],[feq,f4])).
+% SZS output end Proof for ext
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.009 s
+% Peak memory usage: 12 MB
+% ------------------------------
+% ------------------------------

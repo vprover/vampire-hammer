@@ -1,0 +1,60 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for boolean
+% SZS output start Proof for boolean
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, a: i).
+thf(func_def_1, type, p: (i > $o)).
+thf(func_def_2, type, q: (i > $o)).
+thf(func_def_3, type, r: (($o > $o) > $o)).
+thf(func_def_5, type, vAND: ($o > $o > $o)).
+thf(func_def_6, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_9, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(f1,axiom,(
+  (r @ (^[X0 : $o] : (($true & X0))))),
+  file('boolean.p','pos')).
+thf(f2,axiom,(
+  ~(r @ (^[X0 : $o] : (X0)))),
+  file('boolean.p','neg')).
+thf(f3,plain,(
+  (r @ (^[X0 : $o] : (($true & X0))))),
+  inference(rectify,[],[f1])).
+thf(f4,plain,(
+  ($true = ((r @ (^[Y0 : $o]: (Y0 & $true)))))),
+  inference(fool_elimination,[],[f3])).
+thf(f5,plain,(
+  ~(r @ (^[X0 : $o] : (X0)))),
+  inference(rectify,[],[f2])).
+thf(f6,plain,(
+  ~ ($true = ((r @ (^[Y0 : $o]: (Y0)))))),
+  inference(fool_elimination,[],[f5])).
+thf(f7,plain,(
+  ($true != ((r @ (^[Y0 : $o]: (Y0)))))),
+  inference(flattening,[],[f6])).
+thf(f8,plain,(
+  ($true = ((r @ (^[Y0 : $o]: (Y0 & $true)))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f4])).
+thf(f9,plain,(
+  ($true != ((r @ (^[Y0 : $o]: (Y0)))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f7])).
+thf(f12,plain,(
+  ($true = ((r @ (^[Y0 : $o]: (Y0)))))),
+  inference(boolean_simplification,[],[f8])).
+thf(f13,plain,(
+  $false),
+  inference(forward_subsumption_resolution,[unifier([subs(f9,[])]),removed_literals(literal(f12,0))],[f12,f9])).
+% SZS output end Proof for boolean
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.015 s
+% Peak memory usage: 41 MB
+% Instructions burned: 10 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 6
+% -----------------------------
+% ------------------------------

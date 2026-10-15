@@ -1,0 +1,100 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% WARNING Broken Constraint: if shuffle_on_schedule_repeats(off) has been set then mode(vampire) is equal to cascormode(vampire) is equal to smtcompormode(vampire) is equal to portfolio
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+thf(type_def_5, type, s_a0: $tType).
+thf(func_def_0, type, t_a0: (s_a0 > $o)).
+thf(func_def_1, type, t_a1: $o).
+thf(func_def_2, type, vNOT: ($o > $o)).
+thf(func_def_4, type, vOR: ($o > $o > $o)).
+thf(func_def_7, type, vSIGMA: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_8, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_9, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_10, type, vPI: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_11, type, sK0: s_a0).
+thf(f2,axiom,(
+  ((? [X0 : s_a0] : (t_a0 @ X0)) | t_a1)),
+  file('<stdin>','fact1')).
+thf(f3,axiom,(
+  (~ t_a1)),
+  file('<stdin>','fact2')).
+thf(f4,axiom,(
+  ! [X0 : s_a0] : (~ (t_a0 @ X0))),
+  file('<stdin>','fact3')).
+thf(f7,plain,(
+  ((? [X0 : s_a0] : (t_a0 @ X0)) | t_a1)),
+  inference(rectify,[],[f2])).
+thf(f8,plain,(
+  ($true = (((?? @ s_a0 @ (^[Y0 : s_a0]: (t_a0 @ Y0))) | t_a1)))),
+  inference(fool_elimination,[],[f7])).
+thf(f9,plain,(
+  (~ t_a1)),
+  inference(rectify,[],[f3])).
+thf(f10,plain,(
+  (((~ t_a1)) = $true)),
+  inference(fool_elimination,[],[f9])).
+thf(f11,plain,(
+  ! [X0 : s_a0] : (~ (t_a0 @ X0))),
+  inference(rectify,[],[f4])).
+thf(f12,plain,(
+  ($true = ((!! @ s_a0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0))))))),
+  inference(fool_elimination,[],[f11])).
+thf(f14,plain,(
+  ($true = (((?? @ s_a0 @ (^[Y0 : s_a0]: (t_a0 @ Y0))) | t_a1)))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f8])).
+thf(f15,plain,(
+  (((~ t_a1)) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f10])).
+thf(f16,plain,(
+  ($true = ((!! @ s_a0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0))))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f12])).
+thf(f19,plain,(
+  ($true = (((?? @ s_a0 @ t_a0) | t_a1)))),
+  inference('beta-eta_normalization',[],[f14])).
+thf(f21,plain,(
+  ( ! [X1 : s_a0] : (($true = (((^[Y0 : s_a0]: (~ (t_a0 @ Y0))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f16])).
+thf(f22,plain,(
+  ( ! [X1 : s_a0] : (($true = ((~ (t_a0 @ X1))))) )),
+  inference('beta-eta_normalization',[],[f21])).
+thf(f23,plain,(
+  (t_a1 = $false)),
+  inference(not_proxy_clausification,[],[f15])).
+thf(f24,plain,(
+  (t_a1 = $true) | ($true = ((?? @ s_a0 @ t_a0)))),
+  inference(or_proxy_clausification,[],[f19])).
+thf(f25,plain,(
+  ( ! [X1 : s_a0] : (($false = ((t_a0 @ X1)))) )),
+  inference(not_proxy_clausification,[],[f22])).
+thf(f26,plain,(
+  ($false = $true) | ($true = ((?? @ s_a0 @ t_a0)))),
+  inference(forward_demodulation,[unifier([subs(f24,[]),subs(f23,[])]),rewritten_literal(literal(f24,0))],[f24,f23])).
+thf(f27,plain,(
+  ($true = ((?? @ s_a0 @ t_a0)))),
+  inference(trivial_inequality_removal,[],[f26])).
+thf(f28,plain,(
+  ($true = ((t_a0 @ sK0)))),
+  inference(sigma_proxy_clausification,[new_symbols(skolem,[sK0]),quantifier_witness(literal(f27,0),sK0,[])],[f27])).
+thf(f29,plain,(
+  ($false = $true)),
+  inference(forward_demodulation,[unifier([subs(f28,[]),subs(f25,[b(X1,$thf(sK0))])]),rewritten_literal(literal(f28,0))],[f28,f25])).
+thf(f30,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[f29])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.007 s
+% Peak memory usage: 182 MB
+% Instructions burned: 18 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 20
+% clauses deleted: 1
+% -----------------------------
+% ------------------------------

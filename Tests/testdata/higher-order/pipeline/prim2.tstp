@@ -1,0 +1,196 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% WARNING Broken Constraint: if shuffle_on_schedule_repeats(off) has been set then mode(vampire) is equal to cascormode(vampire) is equal to smtcompormode(vampire) is equal to portfolio
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+thf(type_def_5, type, s_a0: $tType).
+thf(func_def_0, type, t_a0: (s_a0 > $o)).
+thf(func_def_1, type, vNOT: ($o > $o)).
+thf(func_def_2, type, vIFF: ($o > $o > $o)).
+thf(func_def_4, type, vSIGMA: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_5, type, vPI: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_6, type, db1: !>[X0: $tType]:(X0)).
+thf(func_def_7, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_8, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_11, type, sK0: ((s_a0 > $o) > s_a0)).
+thf(func_def_12, type, sK1: ((s_a0 > $o) > s_a0)).
+thf(func_def_13, type, sK2: ((s_a0 > $o) > s_a0)).
+thf(func_def_14, type, vEQ: !>[X0: $tType]:((X0 > X0 > $o))).
+thf(func_def_15, type, sK3: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_16, type, sK4: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_17, type, sK5: ((s_a0 > $o) > s_a0)).
+thf(func_def_18, type, sK6: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_19, type, sK7: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_20, type, sK8: ((s_a0 > $o) > s_a0)).
+thf(func_def_21, type, sK9: ((s_a0 > s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_22, type, db2: !>[X0: $tType]:(X0)).
+thf(func_def_23, type, sK10: ((s_a0 > s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_24, type, sK11: ((s_a0 > $o) > s_a0)).
+thf(func_def_25, type, sK12: ((s_a0 > s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_26, type, sK13: ((s_a0 > s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_27, type, sK14: ((s_a0 > $o) > s_a0)).
+thf(func_def_28, type, sK15: ((s_a0 > s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_29, type, sK16: ((s_a0 > s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_30, type, sK17: ((s_a0 > $o) > s_a0)).
+thf(func_def_31, type, sK18: ((s_a0 > $o) > s_a0)).
+thf(func_def_32, type, sK19: ((s_a0 > $o) > s_a0)).
+thf(func_def_33, type, sK20: ((s_a0 > $o) > s_a0)).
+thf(func_def_34, type, sK21: ((s_a0 > $o) > s_a0)).
+thf(func_def_35, type, sK22: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_36, type, sK23: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_37, type, sK24: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_38, type, sK25: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_39, type, sK26: ((s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_40, type, sK27: ((s_a0 > $o) > (s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_41, type, sK28: ((s_a0 > $o) > s_a0)).
+thf(func_def_42, type, sK29: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_43, type, sK30: ((s_a0 > $o) > s_a0)).
+thf(func_def_44, type, sK31: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_45, type, sK32: ((s_a0 > $o) > s_a0)).
+thf(func_def_46, type, sK33: ((s_a0 > $o) > s_a0)).
+thf(func_def_47, type, sK34: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_48, type, sK35: ((s_a0 > $o) > (s_a0 > $o) > s_a0)).
+thf(func_def_49, type, sK36: ((s_a0 > s_a0 > $o) > s_a0)).
+thf(func_def_50, type, sK37: ((s_a0 > $o) > (s_a0 > $o) > s_a0)).
+thf(func_def_51, type, sK38: ((s_a0 > $o) > s_a0)).
+thf(func_def_52, type, sK39: ((s_a0 > $o) > s_a0)).
+thf(func_def_53, type, sK40: ((s_a0 > $o) > s_a0)).
+thf(func_def_54, type, sK41: ((s_a0 > $o) > s_a0)).
+thf(func_def_55, type, sK42: ((s_a0 > $o) > s_a0)).
+thf(func_def_56, type, sK43: ((s_a0 > $o) > s_a0)).
+thf(f1,axiom,(
+  (~ (? [X0 : (s_a0 > $o)] : ! [X1 : s_a0] : ((X0 @ X1) = (~ (t_a0 @ X1)))))),
+  file('<stdin>','fact0')).
+thf(f2,plain,(
+  (~ (? [X0 : (s_a0 > $o)] : ! [X1 : s_a0] : ((X0 @ X1) = (~ (t_a0 @ X1)))))),
+  inference(rectify,[],[f1])).
+thf(f3,plain,(
+  (((~ (?? @ (s_a0 > $o) @ (^[Y0 : s_a0 > $o]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = (~ (t_a0 @ Y1))))))))) = $true)),
+  inference(fool_elimination,[],[f2])).
+thf(f4,plain,(
+  (((~ (?? @ (s_a0 > $o) @ (^[Y0 : s_a0 > $o]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = (~ (t_a0 @ Y1))))))))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f3])).
+thf(f6,axiom,(
+  ( ! [X0 : $o] : (($true = X0) | ($false = X0)) )),
+  introduced(theory,[fool_exhaustiveness_axiom],[])).
+thf(f7,plain,(
+  (((?? @ (s_a0 > $o) @ (^[Y0 : s_a0 > $o]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = (~ (t_a0 @ Y1)))))))) = $false)),
+  inference(not_proxy_clausification,[],[f4])).
+thf(f8,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($false = (((^[Y0 : s_a0 > $o]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((Y0 @ Y1) = (~ (t_a0 @ Y1)))))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f7])).
+thf(f9,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($false = ((!! @ s_a0 @ (^[Y0 : s_a0]: ((X1 @ Y0) = (~ (t_a0 @ Y0)))))))) )),
+  inference('beta-eta_normalization',[],[f8])).
+thf(f10,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($false = (((^[Y0 : s_a0]: ((X1 @ Y0) = (~ (t_a0 @ Y0)))) @ (sK0 @ X1))))) )),
+  inference(sigma_proxy_clausification,[new_symbols(skolem,[sK0]),quantifier_witness(literal(f9,0),sK0,[X1])],[f9])).
+thf(f11,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($false = (((X1 @ (sK0 @ X1)) = (~ (t_a0 @ (sK0 @ X1))))))) )),
+  inference('beta-eta_normalization',[],[f10])).
+thf(f12,plain,(
+  ( ! [X1 : (s_a0 > $o)] : ((((X1 @ (sK0 @ X1))) != ((~ (t_a0 @ (sK0 @ X1)))))) )),
+  inference(iff_proxy_clausification,[],[f11])).
+thf(f13,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($true = ((X1 @ (sK0 @ X1)))) | ($true = ((~ (t_a0 @ (sK0 @ X1)))))) )),
+  inference('xor_proxy_clausification_(simplifying)',[],[f12])).
+thf(f14,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($false = ((X1 @ (sK0 @ X1)))) | ($false = ((~ (t_a0 @ (sK0 @ X1)))))) )),
+  inference('xor_proxy_clausification_(simplifying)',[],[f12])).
+thf(f15,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($false = ((X1 @ (sK0 @ X1)))) | ($true = ((t_a0 @ (sK0 @ X1))))) )),
+  inference(not_proxy_clausification,[],[f14])).
+thf(f16,plain,(
+  ( ! [X1 : (s_a0 > $o)] : (($true = ((X1 @ (sK0 @ X1)))) | ($false = ((t_a0 @ (sK0 @ X1))))) )),
+  inference(not_proxy_clausification,[],[f13])).
+thf(f26,plain,(
+  ( ! [X2 : (s_a0 > $o)] : (($false = (((^[Y0 : s_a0]: (~ (X2 @ Y0))) @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0))))))) | ($true = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) )),
+  inference(primitive_instantiation,[unifier([subs(f15,[b(X1,$thf((^[Y0 : s_a0]: (~ (X2 @ Y0)))))])])],[f15])).
+thf(f56,plain,(
+  ( ! [X2 : (s_a0 > $o)] : (($false = ((~ (X2 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) | ($true = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) )),
+  inference('beta-eta_normalization',[],[f26])).
+thf(f57,plain,(
+  ( ! [X2 : (s_a0 > $o)] : (($true = ((X2 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0))))))) | ($true = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) )),
+  inference(not_proxy_clausification,[],[f56])).
+thf(f64,plain,(
+  ( ! [X2 : (s_a0 > $o)] : (($true = (((^[Y0 : s_a0]: (~ (X2 @ Y0))) @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0))))))) | ($false = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) )),
+  inference(primitive_instantiation,[unifier([subs(f16,[b(X1,$thf((^[Y0 : s_a0]: (~ (X2 @ Y0)))))])])],[f16])).
+thf(f103,plain,(
+  ( ! [X2 : (s_a0 > $o)] : (($true = ((~ (X2 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) | ($false = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) )),
+  inference('beta-eta_normalization',[],[f64])).
+thf(f104,plain,(
+  ( ! [X2 : (s_a0 > $o)] : (($false = ((X2 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0))))))) | ($false = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X2 @ Y0)))))))) )),
+  inference(not_proxy_clausification,[],[f103])).
+thf(f406_vh_constrained_superposition,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($false = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | ($true = $false) | ($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | (X0 != X1)) )),
+  inference(constrained_superposition,[unifier([subs(f104,[b(X2,X1)]),subs(f57,[b(X2,X0)])]),constraints([disequality($thf((s_a0 > $o)),X0,X1)]),rewrite([equality(literal(f57,1)),from($thf((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))),to($thf($true))]),rewritten_literal(literal(f104,1))],[f57,f104])).
+thf(f406,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($true = $false) | ($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | ($false = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | (X0 != X1)) )),
+  inference(associativity_commutativity,[permutation([1,2,0,3])],[f406_vh_constrained_superposition])).
+thf(f426,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | ($false = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | (X0 != X1)) )),
+  inference(trivial_inequality_removal,[],[f406])).
+thf(f4095_vh_constrained_superposition,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($true = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | ($true = $false) | ((^[Y0 : s_a0]: (t_a0 @ ((^[Y1 : s_a0]: (Y1)) @ Y0))) != X1) | ($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | (t_a0 != X0)) )),
+  inference(constrained_superposition,[unifier([subs(f426,[b(X0,X1),b(X1,$thf((^[Y0 : s_a0]: (t_a0 @ ((^[Y1 : s_a0]: (Y1)) @ Y0)))))]),subs(f57,[b(X2,X0)])]),constraints([disequality($thf((s_a0 > $o)),$thf(t_a0),X0)]),rewrite([equality(literal(f57,1)),from($thf(((^[Y0 : s_a0]: (t_a0 @ ((^[Y1 : s_a0]: (Y1)) @ Y0))) @ (sK0 @ (^[Y0 : s_a0]: (~ ((^[Y1 : s_a0]: (t_a0 @ ((^[Y2 : s_a0]: (Y2)) @ Y1))) @ Y0))))))),to($thf($true))]),rewritten_literal(literal(f426,1))],[f57,f426])).
+thf(f4095,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($true = $false) | ($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | ($true = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | ((^[Y0 : s_a0]: (t_a0 @ ((^[Y1 : s_a0]: (Y1)) @ Y0))) != X1) | (t_a0 != X0)) )),
+  inference(associativity_commutativity,[permutation([1,3,0,2,4])],[f4095_vh_constrained_superposition])).
+thf(f4120,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($false != ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | ($true = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | (X0 != X1) | ($true != ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0)))))))) )),
+  inference(equality_factoring,[unifier([subs(f426,[b(X0,X1),b(X1,X0)])])],[f426])).
+thf(f4188,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | ($true = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | ((^[Y0 : s_a0]: (t_a0 @ ((^[Y1 : s_a0]: (Y1)) @ Y0))) != X1) | (t_a0 != X0)) )),
+  inference(trivial_inequality_removal,[],[f4095])).
+thf(f4189,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : ((t_a0 != X1) | ($true = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | ($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | (t_a0 != X0)) )),
+  inference('beta-eta_normalization',[],[f4188])).
+thf(f4442_vh_forward_subsumption_resolution,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($true = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | (X0 != X1) | ($true != ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0)))))))) )),
+  inference(forward_subsumption_resolution,[unifier([subs(f6,[b(X0,$thf((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0)))))))])]),removed_literals(literal(f4120,0))],[f4120,f6])).
+thf(f4442,plain,(
+  ( ! [X0 : (s_a0 > $o),X1 : (s_a0 > $o)] : (($true != ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | ($true = ((X1 @ (sK0 @ (^[Y0 : s_a0]: (~ (X1 @ Y0))))))) | (X0 != X1)) )),
+  inference(associativity_commutativity,[permutation([2,0,1])],[f4442_vh_forward_subsumption_resolution])).
+thf(f11058,plain,(
+  ( ! [X0 : (s_a0 > $o)] : (($true = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0))))))) | ($true = ((X0 @ (sK0 @ (^[Y0 : s_a0]: (~ (X0 @ Y0))))))) | (t_a0 != X0)) )),
+  inference(equality_resolution,[unifier([subs(f4189,[b(X1,$thf(t_a0))])])],[f4189])).
+thf(f11061_vh_forward_subsumption_resolution,plain,(
+  ( ! [X0 : (s_a0 > $o)] : (($true = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0))))))) | (t_a0 != X0)) )),
+  inference(forward_subsumption_resolution,[unifier([subs(f4442,[b(X0,X0),b(X1,$thf(t_a0))])]),removed_literals(literal(f11058,1))],[f11058,f4442])).
+thf(f11061,plain,(
+  ( ! [X0 : (s_a0 > $o)] : ((t_a0 != X0) | ($true = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0)))))))) )),
+  inference(associativity_commutativity,[permutation([1,0])],[f11061_vh_forward_subsumption_resolution])).
+thf(f11067,plain,(
+  ($true = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0)))))))),
+  inference(equality_resolution,[unifier([subs(f11061,[b(X0,$thf(t_a0))])])],[f11061])).
+thf(f11102,plain,(
+  ($true = $false) | ($false = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ ((^[Y1 : s_a0]: (t_a0 @ ((^[Y2 : s_a0]: (Y2)) @ Y1))) @ Y0)))))))),
+  inference(constrained_superposition,[unifier([subs(f11067,[]),subs(f104,[b(X2,$thf((^[Y0 : s_a0]: (t_a0 @ ((^[Y1 : s_a0]: (Y1)) @ Y0)))))])]),constraints([]),rewrite([equality(literal(f104,0)),from($thf((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0))))))),to($thf($false))]),rewritten_literal(literal(f11067,0))],[f104,f11067])).
+thf(f11187,plain,(
+  ($false = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ ((^[Y1 : s_a0]: (t_a0 @ ((^[Y2 : s_a0]: (Y2)) @ Y1))) @ Y0)))))))),
+  inference(trivial_inequality_removal,[],[f11102])).
+thf(f11188,plain,(
+  ($false = ((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0)))))))),
+  inference('beta-eta_normalization',[],[f11187])).
+thf(f11276,plain,(
+  ($true = $false)),
+  inference(constrained_superposition,[unifier([subs(f11188,[]),subs(f11067,[])]),constraints([]),rewrite([equality(literal(f11067,0)),from($thf((t_a0 @ (sK0 @ (^[Y0 : s_a0]: (~ (t_a0 @ Y0))))))),to($thf($true))]),rewritten_literal(literal(f11188,0))],[f11067,f11188])).
+thf(f11364,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[f11276])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 2.453 s
+% Peak memory usage: 179 MB
+% Instructions burned: 21529 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 11445
+% clauses deleted: 9600
+% -----------------------------
+% ------------------------------

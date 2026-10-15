@@ -1,0 +1,35 @@
+% A deterministic resolution certificate with two three-literal parents.
+%
+% The selected literals are index 0. The resolvent preserves the two parent
+% tails as the two operands of its outer disjunction, matching `res_sound1`.
+% It keeps Y0 quantified, while both parents bind X0, so the explicit X0 -> Y0
+% substitutions exercise the delayed conclusion-variable path in Replay/Backend.
+tff(type_s_a0, type, s_a0: $tType).
+tff(type_t_a0, type, t_a0: (s_a0 > $o)).
+tff(type_t_a1, type, t_a1: s_a0).
+tff(type_t_a2, type, t_a2: (s_a0 > $o)).
+tff(type_t_a3, type, t_a3: (s_a0 > $o)).
+tff(type_t_a4, type, t_a4: (s_a0 > $o)).
+tff(type_t_a5, type, t_a5: (s_a0 > $o)).
+tff(f1, axiom, (
+  ~ (t_a0(t_a1) | (t_a2(t_a1) | (t_a3(t_a1) | t_a4(t_a1))))),
+  file('<stdin>', 'fact0')).
+tff(f2, axiom, (
+  ! [X0 : s_a0] : (t_a5(X0) | (t_a0(X0) | t_a2(X0)))),
+  file('<stdin>', 'fact1')).
+tff(f3, axiom, (
+  ! [X0 : s_a0] : ((~ t_a5(X0)) | (t_a3(X0) | t_a4(X0)))),
+  file('<stdin>', 'fact2')).
+tff(f4, plain, (
+  ! [Y0 : s_a0] : ((t_a0(Y0) | t_a2(Y0)) | (t_a3(Y0) | t_a4(Y0)))),
+  inference(resolution,
+    [unifier([subs(f2, [b(X0, Y0)]), subs(f3, [b(X0, Y0)])]),
+     resolved_literals([literal(f2, 0), literal(f3, 0)])],
+    [f2, f3])).
+% This is deliberately an unknown rule: the test ensures the direct f4 proof
+% can be consumed by the existing derived-step fallback at a concrete witness.
+tff(f5, plain, (
+  (t_a0(t_a1) | t_a2(t_a1)) | (t_a3(t_a1) | t_a4(t_a1))),
+  inference(instantiation, [], [f4])).
+tff(f6, plain, ($false),
+  inference(contradiction, [], [f1, f5])).

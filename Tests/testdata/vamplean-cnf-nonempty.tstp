@@ -1,0 +1,19 @@
+% `cnf_prenex1` needs a Nonempty instance: extracting the independent `t_a0`
+% conjunct from `forall x, t_a1(x) & t_a0` chooses one domain element.
+tff(type_s_a0, type, s_a0: $tType).
+tff(type_t_a0, type, t_a0: $o).
+tff(type_t_a1, type, t_a1: (s_a0 > $o)).
+tff(f1, axiom, ((~ t_a0)), file('<stdin>', 'fact0')).
+tff(f2, axiom, ((! [X0: s_a0] : (t_a1(X0) & t_a0))),
+  file('<stdin>', 'fact1')).
+tff(f3, plain, ((! [X0: s_a0] : t_a1(X0))),
+  inference(cnf_transformation, [], [f2])).
+tff(f4, plain, (t_a0),
+  inference(cnf_transformation, [], [f2])).
+tff(f5, plain, ((~ t_a0)),
+  inference(cnf_transformation, [], [f1])).
+tff(f6, plain, ($false),
+  inference(resolution,
+    [unifier([subs(f4, []), subs(f5, [])]),
+     resolved_literals([literal(f4, 0), literal(f5, 0)])],
+    [f4, f5])).

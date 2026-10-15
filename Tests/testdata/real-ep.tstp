@@ -1,0 +1,73 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+tff(type_def_5, type, s_a0: $tType).
+tff(func_def_0, type, t_a0: s_a0 > s_a0).
+tff(func_def_1, type, t_a1: s_a0).
+tff(func_def_2, type, t_a4: s_a0).
+tff(pred_def_1, type, t_a2: s_a0 > $o).
+tff(pred_def_2, type, t_a3: s_a0 > $o).
+tff(pred_def_3, type, sQ0_eqProxy: (s_a0 * s_a0) > $o).
+tff(f2,axiom,(
+  ! [X0 : s_a0] : (t_a0(X0) = t_a1 | t_a2(X0))),
+  file('<stdin>','fact1')).
+tff(f3,axiom,(
+  ! [X0 : s_a0] : ~t_a2(X0)),
+  file('<stdin>','fact2')).
+tff(f4,axiom,(
+  ~t_a3(t_a0(t_a4))),
+  file('<stdin>','fact3')).
+tff(f5,axiom,(
+  t_a3(t_a1)),
+  file('<stdin>','fact4')).
+tff(f7,plain,(
+  ( ! [X0 : s_a0] : (t_a0(X0) = t_a1 | t_a2(X0)) )),
+  inference(cnf_transformation,[],[f2])).
+tff(f8,plain,(
+  ( ! [X0 : s_a0] : (~t_a2(X0)) )),
+  inference(cnf_transformation,[],[f3])).
+tff(f9,plain,(
+  ~t_a3(t_a0(t_a4))),
+  inference(cnf_transformation,[],[f4])).
+tff(f10,plain,(
+  t_a3(t_a1)),
+  inference(cnf_transformation,[],[f5])).
+tff(f11,definition,(
+  ! [X0 : s_a0,X1 : s_a0] : (sQ0_eqProxy(X0,X1) <=> X0 = X1)),
+  introduced(definition,[new_symbols(definition,[sQ0_eqProxy])],[equality_proxy_definition])).
+tff(f12,plain,(
+  ( ! [X0 : s_a0] : (sQ0_eqProxy(t_a0(X0),t_a1) | t_a2(X0)) )),
+  inference(equality_proxy_replacement,[],[f7,f11])).
+tff(f15,plain,(
+  ( ! [X0 : s_a0,X1 : s_a0] : (~sQ0_eqProxy(X0,X1) | ~t_a3(X0) | t_a3(X1)) )),
+  inference(equality_proxy_axiom,[],[f11])).
+tff(f17,plain,(
+  ( ! [X0 : s_a0,X1 : s_a0] : (~sQ0_eqProxy(X0,X1) | sQ0_eqProxy(X1,X0)) )),
+  inference(equality_proxy_axiom,[],[f11])).
+tff(f19,plain,(
+  ( ! [X0 : s_a0] : (sQ0_eqProxy(t_a0(X0),t_a1)) )),
+  inference(forward_subsumption_resolution,[unifier([subs(f8,[b(X0,X0)])]),removed_literals(literal(f12,1))],[f12,f8])).
+tff(f21,plain,(
+  ( ! [X0 : s_a0] : (sQ0_eqProxy(t_a1,t_a0(X0))) )),
+  inference(resolution,[unifier([subs(f17,[b(X0,t_a0(X0)),b(X1,t_a1)]),subs(f19,[])]),resolved_literals([literal(f17,0),literal(f19,0)])],[f17,f19])).
+tff(f25,plain,(
+  ( ! [X0 : s_a0] : (~t_a3(t_a1) | t_a3(t_a0(X0))) )),
+  inference(resolution,[unifier([subs(f15,[b(X0,t_a1),b(X1,t_a0(X0))]),subs(f21,[])]),resolved_literals([literal(f15,0),literal(f21,0)])],[f15,f21])).
+tff(f26,plain,(
+  ( ! [X0 : s_a0] : (t_a3(t_a0(X0))) )),
+  inference(forward_subsumption_resolution,[unifier([subs(f10,[])]),removed_literals(literal(f25,0))],[f25,f10])).
+tff(f27,plain,(
+  $false),
+  inference(resolution,[unifier([subs(f26,[b(X0,t_a4)]),subs(f9,[])]),resolved_literals([literal(f26,0),literal(f9,0)])],[f26,f9])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit dd41db6ec on 2026-10-05 09:43:09 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.012 s
+% Peak memory usage: 116 MB
+% Instructions burned: 1 (million)
+% ------------------------------
+% ------------------------------

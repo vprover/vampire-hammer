@@ -1,0 +1,84 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% WARNING Broken Constraint: if shuffle_on_schedule_repeats(off) has been set then mode(vampire) is equal to cascormode(vampire) is equal to smtcompormode(vampire) is equal to portfolio
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+thf(func_def_0, type, t_a0: ($o > $o)).
+thf(func_def_1, type, t_a1: $o).
+thf(func_def_2, type, vNOT: ($o > $o)).
+thf(f1,axiom,(
+  (~ (t_a0 @ t_a1))),
+  file('<stdin>','fact0')).
+thf(f2,axiom,(
+  (t_a0 @ ($true))),
+  file('<stdin>','fact1')).
+thf(f3,axiom,(
+  (t_a0 @ ($false))),
+  file('<stdin>','fact2')).
+thf(f4,plain,(
+  (~ (t_a0 @ t_a1))),
+  inference(rectify,[],[f1])).
+thf(f5,plain,(
+  (((~ (t_a0 @ t_a1))) = $true)),
+  inference(fool_elimination,[],[f4])).
+thf(f6,plain,(
+  (t_a0 @ ($true))),
+  inference(rectify,[],[f2])).
+thf(f7,plain,(
+  ($true = ((t_a0 @ $true)))),
+  inference(fool_elimination,[],[f6])).
+thf(f8,plain,(
+  (t_a0 @ ($false))),
+  inference(rectify,[],[f3])).
+thf(f9,plain,(
+  ($true = ((t_a0 @ $false)))),
+  inference(fool_elimination,[],[f8])).
+thf(f10,plain,(
+  (((~ (t_a0 @ t_a1))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f5])).
+thf(f11,plain,(
+  ($true = ((t_a0 @ $true)))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f7])).
+thf(f12,plain,(
+  ($true = ((t_a0 @ $false)))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f9])).
+thf(f14,axiom,(
+  ( ! [X0 : $o] : (($true = X0) | ($false = X0)) )),
+  introduced(theory,[fool_exhaustiveness_axiom],[])).
+thf(f15,plain,(
+  (((t_a0 @ t_a1)) = $false)),
+  inference(not_proxy_clausification,[],[f10])).
+thf(f28,plain,(
+  (((t_a0 @ $true)) = $false) | (t_a1 = $false)),
+  inference(constrained_superposition,[unifier([subs(f15,[]),subs(f14,[b(X0,$thf(t_a1))])]),constraints([]),rewrite([equality(literal(f14,0)),from($thf(t_a1)),to($thf($true))]),rewritten_literal(literal(f15,0))],[f15,f14])).
+thf(f31,plain,(
+  ($true = $false) | (t_a1 = $false)),
+  inference(forward_demodulation,[unifier([subs(f28,[]),subs(f11,[])]),rewritten_literal(literal(f28,0))],[f28,f11])).
+thf(f32,plain,(
+  (t_a1 = $false)),
+  inference(trivial_inequality_removal,[],[f31])).
+thf(f40,plain,(
+  ($false = ((t_a0 @ $false)))),
+  inference(constrained_superposition,[unifier([subs(f15,[]),subs(f32,[])]),constraints([]),rewrite([equality(literal(f32,0)),from($thf(t_a1)),to($thf($false))]),rewritten_literal(literal(f15,0))],[f15,f32])).
+thf(f44,plain,(
+  ($true = $false)),
+  inference(constrained_superposition,[unifier([subs(f40,[]),subs(f12,[])]),constraints([]),rewrite([equality(literal(f12,0)),from($thf((t_a0 @ $false))),to($thf($true))]),rewritten_literal(literal(f40,0))],[f12,f40])).
+thf(f45,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[f44])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.011 s
+% Peak memory usage: 167 MB
+% Instructions burned: 32 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 45
+% clauses deleted: 19
+% -----------------------------
+% ------------------------------

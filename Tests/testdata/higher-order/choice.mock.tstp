@@ -1,0 +1,84 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for quantified
+% SZS output start Proof for quantified
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, a: i).
+thf(func_def_1, type, p: ((i > i) > $o)).
+thf(func_def_3, type, vSIGMA: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_4, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_5, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_8, type, vPI: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_9, type, vNOT: ($o > $o)).
+thf(func_def_10, type, sK0: (i > i)).
+thf(choice_type,type,c:(((i > i) > $o) > (i > i))).
+thf(f1,axiom,(
+  ((? [X0 : (i > i)] : (p @ X0)) = ($true))),
+  file('Tests/testdata/higher-order/quantified.p','ex')).
+thf(f2,axiom,(
+  ! [X0 : (i > i)] : ~(p @ X0)),
+  file('Tests/testdata/higher-order/quantified.p','neg')).
+thf(f3,plain,(
+  ((? [X0 : (i > i)] : (p @ X0)) = ($true))),
+  inference(rectify,[],[f1])).
+thf(f4,plain,(
+  (((?? @ (i > i) @ (^[Y0 : i > i]: (p @ Y0)))) = $true)),
+  inference(fool_elimination,[],[f3])).
+thf(f5,plain,(
+  ! [X0 : (i > i)] : ~(p @ X0)),
+  inference(rectify,[],[f2])).
+thf(f6,plain,(
+  ($true = ((!! @ (i > i) @ (^[Y0 : i > i]: (~ (p @ Y0))))))),
+  inference(fool_elimination,[],[f5])).
+thf(f7,plain,(
+  (((?? @ (i > i) @ (^[Y0 : i > i]: (p @ Y0)))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f4])).
+thf(f8,plain,(
+  ($true = ((!! @ (i > i) @ (^[Y0 : i > i]: (~ (p @ Y0))))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f6])).
+thf(f11,plain,(
+  ($true = ((?? @ (i > i) @ p)))),
+  inference('beta-eta_normalization',[],[f7])).
+thf(f12,plain,(
+  ( ! [X1 : (i > i)] : (($true = (((^[Y0 : i > i]: (~ (p @ Y0))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f8])).
+thf(f13,plain,(
+  ( ! [X1 : (i > i)] : (($true = ((~ (p @ X1))))) )),
+  inference('beta-eta_normalization',[],[f12])).
+thf(f14,plain,(
+  ($true = ((p @ sK0)))),
+  inference(sigma_proxy_clausification,[new_symbols(skolem,[sK0]),quantifier_witness(literal(f11,0),sK0,[])],[f11])).
+thf(f15,plain,(
+  ( ! [X1 : (i > i)] : (($false = ((p @ X1)))) )),
+  inference(not_proxy_clausification,[],[f13])).
+% Synthetic choice suffix of the real quantified proof.
+thf(fchoice,plain,(
+  ![F:(i>i)]: ((p @ F) = $false | (p @ (c @ p)) = $true)),
+  inference('Hilbertian_choice_axiom_instance',[new_symbols(choice,[c]),choice_axiom(c,$thf(p),F)],[])).
+thf(fchoice2,plain,(
+  ![F:(i>i)]: ((p @ F) = $false | (p @ (c @ p)) = $true)),
+  inference('Hilbertian_choice_axiom_instance',[choice_axiom(c,$thf(p),F)],[])).
+thf(fchoice_rewrite,plain,(
+  ($true = $false) | ((p @ (c @ p)) = $true)),
+  inference(constrained_superposition,[unifier([subs(fchoice2,[b(F,$thf(sK0))]),subs(f14,[])]),rewrite([equality(literal(f14,0)),from($thf(p @ sK0)),to($thf($true))]),rewritten_literal(literal(fchoice2,0)),constraints([])],[fchoice2,f14])).
+thf(fchosen,plain,(
+  ((p @ (c @ p)) = $true)),
+  inference(boolean_simplification,[],[fchoice_rewrite])).
+thf(fchoice_false,plain,(
+  ($true = $false)),
+  inference(constrained_superposition,[unifier([subs(f15,[b(X1,$thf(c @ p))]),subs(fchosen,[])]),rewrite([equality(literal(fchosen,0)),from($thf(p @ (c @ p))),to($thf($true))]),rewritten_literal(literal(f15,0)),constraints([])],[f15,fchosen])).
+thf(fchoice_end,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[fchoice_false])).
+% SZS output end Proof for quantified
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.001 s
+% Peak memory usage: 12 MB
+% Instructions burned: 1 (million)
+% ------------------------------
+% ------------------------------

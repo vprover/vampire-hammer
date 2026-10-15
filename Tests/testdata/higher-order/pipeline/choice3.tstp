@@ -1,0 +1,75 @@
+% input_syntax=auto not supported for standard input parsing, switching to tptp.
+% WARNING Broken Constraint: if shuffle_on_schedule_repeats(off) has been set then mode(vampire) is equal to cascormode(vampire) is equal to smtcompormode(vampire) is equal to portfolio
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for unknown
+% SZS output start Proof for unknown
+thf(type_def_5, type, s_a0: $tType).
+thf(func_def_0, type, t_a0: (s_a0 > $o)).
+thf(func_def_1, type, vNOT: ($o > $o)).
+thf(func_def_2, type, vIMP: ($o > $o > $o)).
+thf(func_def_4, type, vSIGMA: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_5, type, vPI: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_6, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_7, type, db1: !>[X0: $tType]:(X0)).
+thf(func_def_8, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_11, type, vEPSILON: !>[X0: $tType]:(((X0 > $o) > X0))).
+thf(func_def_12, type, sK0: (((s_a0 > $o) > s_a0) > s_a0)).
+thf(func_def_13, type, vEQ: !>[X0: $tType]:((X0 > X0 > $o))).
+thf(f1,axiom,(
+  (~ (? [X0 : ((s_a0 > $o) > s_a0)] : ! [X1 : s_a0] : ((t_a0 @ X1) => (t_a0 @ (X0 @ t_a0)))))),
+  file('<stdin>','fact0')).
+thf(f2,plain,(
+  (~ (? [X0 : ((s_a0 > $o) > s_a0)] : ! [X1 : s_a0] : ((t_a0 @ X1) => (t_a0 @ (X0 @ t_a0)))))),
+  inference(rectify,[],[f1])).
+thf(f3,plain,(
+  (((~ (?? @ ((s_a0 > $o) > s_a0) @ (^[Y0 : (s_a0 > $o) > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((t_a0 @ Y1) => (t_a0 @ (Y0 @ t_a0))))))))) = $true)),
+  inference(fool_elimination,[],[f2])).
+thf(f5,plain,(
+  (((~ (?? @ ((s_a0 > $o) > s_a0) @ (^[Y0 : (s_a0 > $o) > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((t_a0 @ Y1) => (t_a0 @ (Y0 @ t_a0))))))))) = $true)),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f3])).
+thf(f8,plain,(
+  (((?? @ ((s_a0 > $o) > s_a0) @ (^[Y0 : (s_a0 > $o) > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((t_a0 @ Y1) => (t_a0 @ (Y0 @ t_a0)))))))) = $false)),
+  inference(not_proxy_clausification,[],[f5])).
+thf(f9,plain,(
+  ( ! [X1 : ((s_a0 > $o) > s_a0)] : (($false = (((^[Y0 : (s_a0 > $o) > s_a0]: (!! @ s_a0 @ (^[Y1 : s_a0]: ((t_a0 @ Y1) => (t_a0 @ (Y0 @ t_a0)))))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f8])).
+thf(f10,plain,(
+  ( ! [X1 : ((s_a0 > $o) > s_a0)] : (($false = ((!! @ s_a0 @ (^[Y0 : s_a0]: ((t_a0 @ Y0) => (t_a0 @ (X1 @ t_a0)))))))) )),
+  inference('beta-eta_normalization',[],[f9])).
+thf(f11,plain,(
+  ( ! [X1 : ((s_a0 > $o) > s_a0)] : (($false = (((^[Y0 : s_a0]: ((t_a0 @ Y0) => (t_a0 @ (X1 @ t_a0)))) @ (sK0 @ X1))))) )),
+  inference(sigma_proxy_clausification,[new_symbols(skolem,[sK0]),quantifier_witness(literal(f10,0),sK0,[X1])],[f10])).
+thf(f12,plain,(
+  ( ! [X1 : ((s_a0 > $o) > s_a0)] : (($false = (((t_a0 @ (sK0 @ X1)) => (t_a0 @ (X1 @ t_a0)))))) )),
+  inference('beta-eta_normalization',[],[f11])).
+thf(f13,plain,(
+  ( ! [X1 : ((s_a0 > $o) > s_a0)] : (($false = ((t_a0 @ (X1 @ t_a0))))) )),
+  inference('imp_proxy_clausification_(simplifying)',[],[f12])).
+thf(f14,plain,(
+  ( ! [X1 : ((s_a0 > $o) > s_a0)] : (($true = ((t_a0 @ (sK0 @ X1))))) )),
+  inference('imp_proxy_clausification_(simplifying)',[],[f12])).
+thf(f90,plain,(
+  ( ! [X0 : ((s_a0 > $o) > (s_a0 > $o) > s_a0),X1 : ((s_a0 > $o) > s_a0)] : (($true = $false) | (((X0 @ t_a0)) != X1)) )),
+  inference(constrained_superposition,[unifier([subs(f14,[]),subs(f13,[b(X1,$thf((^[Y0 : s_a0 > $o]: (sK0 @ (X0 @ Y0)))))])]),constraints([disequality($thf(((s_a0 > $o) > s_a0)),$thf((X0 @ t_a0)),X1)]),rewrite([equality(literal(f13,0)),from($thf((t_a0 @ (sK0 @ X1)))),to($thf($false))]),rewritten_literal(literal(f14,0))],[f13,f14])).
+thf(f94,plain,(
+  ( ! [X0 : ((s_a0 > $o) > (s_a0 > $o) > s_a0),X1 : ((s_a0 > $o) > s_a0)] : ((((X0 @ t_a0)) != X1)) )),
+  inference(trivial_inequality_removal,[],[f90])).
+thf(f95,plain,(
+  $false),
+  inference('flex-flex_simplification',[unifier([subs(f94,[b(X0,$thf((^[Y0 : s_a0 > $o]: ((^[Y1 : s_a0 > $o]: (X2)))))),b(X1,$thf((^[Y0 : s_a0 > $o]: (X2))))])])],[f94])).
+% SZS output end Proof for unknown
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.038 s
+% Peak memory usage: 178 MB
+% Instructions burned: 100 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 97
+% clauses deleted: 59
+% -----------------------------
+% ------------------------------

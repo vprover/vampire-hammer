@@ -1,0 +1,23 @@
+% Equality resolution with a non-empty parent substitution.
+tff(type_def_0, type, s_a0: $tType).
+tff(func_def_0, type, t_a0: s_a0).
+tff(pred_def_1, type, t_a1: s_a0 > $o).
+tff(f1,axiom,(
+  ! [X0 : s_a0] : (X0 != t_a0 | t_a1(X0))),
+  file('<stdin>','fact1')).
+tff(f2,axiom,(
+  ~t_a1(t_a0)),
+  file('<stdin>','fact2')).
+tff(f3,plain,(
+  ! [X0 : s_a0] : (X0 != t_a0 | t_a1(X0))),
+  inference(cnf_transformation,[],[f1])).
+tff(f4,plain,(
+  ~t_a1(t_a0)),
+  inference(cnf_transformation,[],[f2])).
+tff(f5,plain,(
+  t_a1(t_a0)),
+  inference(equality_resolution,[unifier([subs(f3,[b(X0,t_a0)])])],[f3])).
+tff(f6,plain,(
+  $false),
+  inference(forward_subsumption_resolution,
+    [unifier([]),resolved_literals([literal(f5,0),literal(f4,0)])],[f5,f4])).

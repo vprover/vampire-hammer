@@ -1,0 +1,41 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for ext-dependencies
+% SZS output start Proof for ext-dependencies
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, f: (i > i > i)).
+thf(func_def_1, type, g: (i > i > i)).
+thf(func_def_3, type, sK0: (i > i)).
+thf(f1,axiom,(
+  ! [X0 : i,X1 : i] : (((f @ X0 @ X1)) = ((g @ X0 @ X1)))),
+  file('ext-dependencies.p','pointwise')).
+thf(f2,axiom,(
+  ! [X0 : i] : (((f @ X0)) != ((g @ X0)))),
+  file('ext-dependencies.p','neg')).
+thf(f3,plain,(
+  ( ! [X0 : i,X1 : i] : ((((f @ X0 @ X1)) = ((g @ X0 @ X1)))) )),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0),b(X1,X1)]),literal_permutation([0]),swapped_equalities([])],[f1])).
+thf(f4,plain,(
+  ( ! [X0 : i] : ((((f @ X0)) != ((g @ X0)))) )),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0)]),literal_permutation([0]),swapped_equalities([])],[f2])).
+thf(f5,plain,(
+  ( ! [X0 : i] : ((((f @ X0 @ (sK0 @ X0))) != ((g @ X0 @ (sK0 @ X0))))) )),
+  inference(negative_extensionality,[new_symbols(skolem,[sK0]),extensionality_witness(literal(f4,0),sK0,[X0])],[f4])).
+thf(f6,plain,(
+  $false),
+  inference(forward_subsumption_resolution,[unifier([subs(f3,[b(X0,X0),b(X1,$thf((sK0 @ X0)))])]),removed_literals(literal(f5,0))],[f5,f3])).
+% SZS output end Proof for ext-dependencies
+% ------------------------------
+% Version: Vampire 5.1.0 (Debug build, commit 5828cbabc on 2026-10-08 16:29:50 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.003 s
+% Peak memory usage: 17 MB
+% Instructions burned: 5 (million)
+% ------------------------------
+% ----  Runtime statistics ----
+% clauses created: 4
+% -----------------------------
+% ------------------------------

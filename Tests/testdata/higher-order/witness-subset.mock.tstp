@@ -1,0 +1,22 @@
+% Source facts from witness-subset.p; synthetic suffix retains the side literal
+% while selecting a difference witness with reordered, reduced dependencies.
+thf(i_type,type,i:$tType).
+thf(f_type,type,f:i>i>i>i).
+thf(g_type,type,g:i>i>i>i).
+thf(side_type,type,side:i>$o).
+thf(sk_type,type,sK0:i>i>i).
+thf(f1,axiom,![X0:i,X1:i,X2:i]:((f @ X0 @ X1 @ X2) = (g @ X0 @ X1 @ X2)),file('witness-subset.p',pointwise)).
+thf(f2,axiom,![X0:i,X1:i,X2:i]:((side @ X2) | ((f @ X0 @ X1) != (g @ X0 @ X1))),file('witness-subset.p',neg)).
+thf(f3,axiom,![X2:i]:~(side @ X2),file('witness-subset.p',neg_side)).
+thf(f1c,plain,![X0:i,X1:i,X2:i]:((f @ X0 @ X1 @ X2) = (g @ X0 @ X1 @ X2)),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0),b(X1,X1),b(X2,X2)]),literal_permutation([0]),swapped_equalities([])],[f1])).
+thf(f3c,plain,![X2:i]:~(side @ X2),
+  inference(cnf_transformation,[binder_mapping([b(X2,X2)]),literal_permutation([0]),swapped_equalities([])],[f3])).
+thf(f4,plain,![X0:i,X1:i,X2:i]:((side @ X2) | ((f @ X0 @ X1) != (g @ X0 @ X1))),
+  inference(cnf_transformation,[binder_mapping([b(X0,X0),b(X1,X1),b(X2,X2)]),literal_permutation([0,1]),swapped_equalities([])],[f2])).
+thf(f5,plain,![X0:i,X1:i,X2:i]:((side @ X2) | ((f @ X0 @ X1 @ (sK0 @ X1 @ X0)) != (g @ X0 @ X1 @ (sK0 @ X1 @ X0)))),
+  inference(negative_extensionality,[new_symbols(skolem,[sK0]),extensionality_witness(literal(f4,1),sK0,[X1,X0])],[f4])).
+thf(f6,plain,![X0:i,X1:i,X2:i]:(side @ X2),
+  inference(forward_subsumption_resolution,[unifier([subs(f1c,[b(X0,X0),b(X1,X1),b(X2,$thf(sK0 @ X1 @ X0))])]),removed_literals(literal(f5,1))],[f5,f1c])).
+thf(f7,plain,$false,
+  inference(forward_subsumption_resolution,[unifier([subs(f3c,[b(X2,X2)])]),removed_literals(literal(f6,0))],[f6,f3c])).

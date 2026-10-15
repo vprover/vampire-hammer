@@ -1,0 +1,122 @@
+% Running in auto input_syntax mode. Trying TPTP
+% WARNING: newcnf not compatible with higher-order problems
+% Refutation found. Thanks to Tanya!
+% SZS status Unsatisfiable for quantified-dependencies
+% SZS output start Proof for quantified-dependencies
+thf(type_def_5, type, i: $tType).
+thf(func_def_0, type, a: i).
+thf(func_def_1, type, p: (i > (i > i) > $o)).
+thf(func_def_2, type, side: (i > $o)).
+thf(func_def_4, type, vPI: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_5, type, vOR: ($o > $o > $o)).
+thf(func_def_6, type, db0: !>[X0: $tType]:(X0)).
+thf(func_def_7, type, vSIGMA: !>[X0: $tType]:(((X0 > $o) > $o))).
+thf(func_def_8, type, db1: !>[X0: $tType]:(X0)).
+thf(func_def_9, type, vLAM: !>[X0: $tType, X1: $tType]:((X1) > (X0 > X1))).
+thf(func_def_12, type, vEQ: !>[X0: $tType]:((X0 > X0 > $o))).
+thf(func_def_13, type, vNOT: ($o > $o)).
+thf(func_def_14, type, sK0: (i > i > i)).
+thf(f1,axiom,(
+  ! [X0 : i] : (((? [X1 : (i > i)] : (p @ X0 @ X1)) = ($true)) | (side @ X0))),
+  file('Tests/testdata/higher-order/quantified-dependencies.p','ex')).
+thf(f2,axiom,(
+  ! [X0 : i,X1 : (i > i)] : ~(p @ X0 @ X1)),
+  file('Tests/testdata/higher-order/quantified-dependencies.p','neg')).
+thf(f3,axiom,(
+  ! [X0 : i] : ~(side @ X0)),
+  file('Tests/testdata/higher-order/quantified-dependencies.p','neg_side')).
+thf(f4,plain,(
+  ! [X0 : i] : (((? [X1 : (i > i)] : (p @ X0 @ X1)) = ($true)) | (side @ X0))),
+  inference(rectify,[],[f1])).
+thf(f5,plain,(
+  ($true = ((!! @ i @ (^[Y0 : i]: ((side @ Y0) | ((?? @ (i > i) @ (^[Y1 : i > i]: (p @ Y0 @ Y1))) = $true))))))),
+  inference(fool_elimination,[],[f4])).
+thf(f6,plain,(
+  ! [X0 : i,X1 : (i > i)] : ~(p @ X0 @ X1)),
+  inference(rectify,[],[f2])).
+thf(f7,plain,(
+  ($true = ((!! @ (i > i) @ (^[Y0 : i > i]: (!! @ i @ (^[Y1 : i]: (~ (p @ Y1 @ Y0))))))))),
+  inference(fool_elimination,[],[f6])).
+thf(f8,plain,(
+  ! [X0 : i] : ~(side @ X0)),
+  inference(rectify,[],[f3])).
+thf(f9,plain,(
+  ($true = ((!! @ i @ (^[Y0 : i]: (~ (side @ Y0))))))),
+  inference(fool_elimination,[],[f8])).
+thf(f10,plain,(
+  ($true = ((!! @ i @ (^[Y0 : i]: ((side @ Y0) | ((?? @ (i > i) @ (^[Y1 : i > i]: (p @ Y0 @ Y1))) = $true))))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f5])).
+thf(f11,plain,(
+  ($true = ((!! @ (i > i) @ (^[Y0 : i > i]: (!! @ i @ (^[Y1 : i]: (~ (p @ Y1 @ Y0))))))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f7])).
+thf(f12,plain,(
+  ($true = ((!! @ i @ (^[Y0 : i]: (~ (side @ Y0))))))),
+  inference(cnf_transformation,[binder_mapping([]),literal_permutation([0]),swapped_equalities([])],[f9])).
+thf(f15,plain,(
+  ($true = ((!! @ i @ (^[Y0 : i]: ((side @ Y0) | ((?? @ (i > i) @ (p @ Y0)) = $true))))))),
+  inference('beta-eta_normalization',[],[f10])).
+thf(f16,plain,(
+  ( ! [X1 : i] : (($true = (((^[Y0 : i]: (~ (side @ Y0))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f12])).
+thf(f17,plain,(
+  ( ! [X1 : i] : (($true = ((~ (side @ X1))))) )),
+  inference('beta-eta_normalization',[],[f16])).
+thf(f18,plain,(
+  ( ! [X1 : (i > i)] : (($true = (((^[Y0 : i > i]: (!! @ i @ (^[Y1 : i]: (~ (p @ Y1 @ Y0))))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f11])).
+thf(f19,plain,(
+  ( ! [X1 : (i > i)] : (($true = ((!! @ i @ (^[Y0 : i]: (~ (p @ Y0 @ X1))))))) )),
+  inference('beta-eta_normalization',[],[f18])).
+thf(f20,plain,(
+  ( ! [X1 : i] : (($true = (((^[Y0 : i]: ((side @ Y0) | ((?? @ (i > i) @ (p @ Y0)) = $true))) @ X1)))) )),
+  inference(pi_proxy_clausification,[],[f15])).
+thf(f21,plain,(
+  ( ! [X1 : i] : (($true = (((side @ X1) | ((?? @ (i > i) @ (p @ X1)) = $true))))) )),
+  inference('beta-eta_normalization',[],[f20])).
+thf(f22,plain,(
+  ( ! [X1 : i] : (($false = ((side @ X1)))) )),
+  inference(not_proxy_clausification,[],[f17])).
+thf(f23,plain,(
+  ( ! [X2 : i,X1 : (i > i)] : (($true = (((^[Y0 : i]: (~ (p @ Y0 @ X1))) @ X2)))) )),
+  inference(pi_proxy_clausification,[],[f19])).
+thf(f24,plain,(
+  ( ! [X2 : i,X1 : (i > i)] : (($true = ((~ (p @ X2 @ X1))))) )),
+  inference('beta-eta_normalization',[],[f23])).
+thf(f25,plain,(
+  ( ! [X1 : i] : (($true = (((?? @ (i > i) @ (p @ X1)) = $true))) | ($true = ((side @ X1)))) )),
+  inference(or_proxy_clausification,[],[f21])).
+thf(f26,plain,(
+  ( ! [X2 : i,X1 : (i > i)] : (($false = ((p @ X2 @ X1)))) )),
+  inference(not_proxy_clausification,[],[f24])).
+thf(f27_vh_forward_demodulation,plain,(
+  ( ! [X1 : i] : (($true = (((?? @ (i > i) @ (p @ X1)) = $true))) | ($true = $false)) )),
+  inference(forward_demodulation,[unifier([subs(f25,[]),subs(f22,[b(X1,X1)])]),rewritten_literal(literal(f25,1))],[f25,f22])).
+thf(f27,plain,(
+  ( ! [X1 : i] : (($true = $false) | ($true = (((?? @ (i > i) @ (p @ X1)) = $true)))) )),
+  inference(associativity_commutativity,[permutation([1,0])],[f27_vh_forward_demodulation])).
+thf(f28,plain,(
+  ( ! [X1 : i] : (($true = (((?? @ (i > i) @ (p @ X1)) = $true)))) )),
+  inference(trivial_inequality_removal,[],[f27])).
+thf(f29,plain,(
+  ( ! [X1 : i] : (($true = ((?? @ (i > i) @ (p @ X1))))) )),
+  inference(equality_proxy_clausification,[],[f28])).
+thf(f30,plain,(
+  ( ! [X1 : i] : (($true = ((p @ X1 @ (sK0 @ X1))))) )),
+  inference(sigma_proxy_clausification,[new_symbols(skolem,[sK0]),quantifier_witness(literal(f29,0),sK0,[X1])],[f29])).
+thf(f31,plain,(
+  ($true = $false)),
+  inference(forward_demodulation,[unifier([subs(f30,[]),subs(f26,[b(X2,X1),b(X1,$thf(sK0 @ X1))])]),rewritten_literal(literal(f30,0))],[f30,f26])).
+thf(f32,plain,(
+  $false),
+  inference(trivial_inequality_removal,[],[f31])).
+% SZS output end Proof for quantified-dependencies
+% ------------------------------
+% Version: Vampire 5.1.0 (Release build, commit 124fd539f on 2026-10-07 16:19:54 +0200)
+% Linked with Z3 4.14.0.0 3c47fd96cf5645d0c42b2c819d9e9a84380aa721 z3-4.8.4-9178-g3c47fd96c
+% CaDiCaL version: 2.1.3
+% Termination reason: Refutation
+% Time elapsed: 0.001 s
+% Peak memory usage: 11 MB
+% Instructions burned: 1 (million)
+% ------------------------------
+% ------------------------------

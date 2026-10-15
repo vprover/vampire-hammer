@@ -1,0 +1,16 @@
+tff(sort_a,type,s_a0:$tType).
+tff(a,type,t_a0:s_a0).
+tff(b,type,t_a1:s_a0).
+tff(r,type,t_a2:$o).
+tff(f,type,t_a3:s_a0>s_a0).
+tff(f1,axiom,(t_a0=t_a1|t_a2),file('<stdin>','fact1')).
+tff(f2,axiom,t_a3(t_a0)!=t_a3(t_a1),file('<stdin>','fact2')).
+tff(f9,axiom,~t_a2,file('<stdin>','fact3')).
+tff(f3,axiom,(t_a0!=t_a1|t_a3(t_a0)=t_a3(t_a1)),introduced(theory,[theory_tautology_sat_conflict],[])).
+tff(f4,plain,(t_a0=t_a1|t_a2),inference(cnf_transformation,[],[f1])).
+tff(f5,plain,t_a3(t_a0)!=t_a3(t_a1),inference(cnf_transformation,[],[f2])).
+tff(f10,plain,~t_a2,inference(cnf_transformation,[],[f9])).
+tff(f6,plain,(t_a0!=t_a1|t_a3(t_a0)=t_a3(t_a1)),inference(cnf_transformation,[],[f3])).
+tff(f7,plain,(t_a2|t_a3(t_a0)=t_a3(t_a1)),inference(resolution,[unifier([subs(f4,[]),subs(f6,[])]),resolved_literals([literal(f4,0),literal(f6,0)])],[f4,f6])).
+tff(f8,plain,t_a3(t_a0)=t_a3(t_a1),inference(resolution,[unifier([subs(f7,[]),subs(f10,[])]),resolved_literals([literal(f7,0),literal(f10,0)])],[f7,f10])).
+tff(f11,plain,$false,inference(resolution,[unifier([subs(f8,[]),subs(f5,[])]),resolved_literals([literal(f8,0),literal(f5,0)])],[f8,f5])).

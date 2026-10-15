@@ -1,0 +1,90 @@
+% Deterministic coverage for Backend/Naming.lean and the new handlers in
+% Backend/Definitions.lean, in the shapes Vampire prints.
+%
+% f44 is a scaffold (unknown rule) extracting a conjunct; every other
+% derived step uses one of the rules under test. As in Vampire's output, the
+% general-splitting component clause f30 precedes its definition f30_D, and
+% the inequality-splitting clauses precede their name introductions.
+tff(type_s_a0, type, s_a0: $tType).
+tff(type_t_a0, type, t_a0: ((s_a0 * s_a0) > $o)).
+tff(type_t_a1, type, t_a1: ((s_a0 * s_a0) > $o)).
+tff(type_t_a2, type, t_a2: (s_a0 > s_a0)).
+tff(type_t_a3, type, t_a3: s_a0).
+tff(type_t_a4, type, t_a4: (s_a0 > $o)).
+tff(type_t_a5, type, t_a5: (s_a0 > $o)).
+tff(type_t_a6, type, t_a6: (s_a0 > $o)).
+tff(type_t_a7, type, t_a7: (s_a0 > s_a0)).
+tff(type_t_a8, type, t_a8: (s_a0 > $o)).
+tff(type_t_a9, type, t_a9: (s_a0 > $o)).
+tff(type_t_a10, type, t_a10: (s_a0 > $o)).
+tff(type_t_a11, type, t_a11: (s_a0 > $o)).
+tff(type_sP0, type, sP0: (s_a0 > $o)).
+tff(type_sP1, type, sP1: (s_a0 > $o)).
+tff(type_sP2, type, sP2: (s_a0 > $o)).
+tff(type_sQ0, type, sQ0: ((s_a0 * s_a0) > $o)).
+tff(type_sF0, type, sF0: (s_a0 > s_a0)).
+tff(f1, axiom, (! [X0: s_a0] : (! [X1: s_a0] : (! [X2: s_a0] : (t_a0(X0, X1) | t_a1(X1, X2))))), file('<stdin>', 'fact1')).
+tff(f2, axiom, (! [X0: s_a0] : ((~ (t_a2(X0) = t_a3)) | t_a4(X0))), file('<stdin>', 'fact2')).
+tff(f3, axiom, (! [X0: s_a0] : ((~ (t_a3 = t_a2(X0))) | t_a5(X0))), file('<stdin>', 'fact3')).
+tff(f4, axiom, (! [X0: s_a0] : ((t_a2(X0) = t_a3) | t_a6(X0))), file('<stdin>', 'fact4')).
+tff(f5, axiom, ((! [X0: s_a0] : (t_a7(X0) = t_a2(t_a2(X0)))) & t_a6(t_a3)), file('<stdin>', 'fact5')).
+tff(f6, axiom, (! [X0: s_a0] : t_a8(t_a7(X0))), file('<stdin>', 'fact6')).
+tff(f7, axiom, (~ t_a8(t_a2(t_a2(t_a3)))), file('<stdin>', 'fact7')).
+tff(f8, axiom, ((! [X0: s_a0] : (t_a9(X0) <=> (t_a10(X0) | t_a11(X0)))) & t_a6(t_a3)), file('<stdin>', 'fact8')).
+tff(f44, plain, (! [X0: s_a0] : (t_a9(X0) <=> (t_a10(X0) | t_a11(X0)))),
+  inference(conjunct, [], [f8])).
+tff(f45, plain, (! [X0: s_a0] : (t_a9(X0) => (t_a10(X0) | t_a11(X0)))),
+  inference(unused_predicate_definition_removal, [], [f44])).
+tff(f21, plain, (! [X0: s_a0, X1: s_a0, X2: s_a0] : (t_a0(X0, X1) | t_a1(X1, X2))),
+  inference(cnf_transformation, [], [f1])).
+tff(f22, plain, (! [X0: s_a0] : (t_a2(X0) != t_a3 | t_a4(X0))),
+  inference(cnf_transformation, [], [f2])).
+tff(f23, plain, (! [X0: s_a0] : (t_a3 != t_a2(X0) | t_a5(X0))),
+  inference(cnf_transformation, [], [f3])).
+tff(f24, plain, (! [X0: s_a0] : (t_a2(X0) = t_a3 | t_a6(X0))),
+  inference(cnf_transformation, [], [f4])).
+tff(f25, plain, (! [X0: s_a0] : (t_a7(X0) = t_a2(t_a2(X0)))),
+  inference(cnf_transformation, [], [f5])).
+tff(f26, plain, (! [X0: s_a0] : t_a8(t_a7(X0))),
+  inference(cnf_transformation, [], [f6])).
+tff(f30, plain, (! [X0: s_a0, X1: s_a0] : (t_a0(X0, X1) | sP0(X1))),
+  inference(cnf_transformation, [], [f30_D])).
+tff(f30_D, definition, (! [X1: s_a0] : ((! [X0: s_a0] : t_a0(X0, X1)) <=> ~sP0(X1))),
+  introduced(definition, [new_symbols(definition, [sP0])], [general_splitting_component_introduction])).
+tff(f31, plain, (! [X1: s_a0, X2: s_a0] : (t_a1(X1, X2) | ~sP0(X1))),
+  inference(general_splitting, [], [f21, f30_D])).
+tff(f32, plain, (! [X0: s_a0] : (sP1(t_a2(X0)) | t_a4(X0))),
+  inference(inequality_splitting, [], [f22, f33])).
+tff(f33, plain, (~ sP1(t_a3)),
+  introduced(definition, [new_symbols(definition, [sP1])], [inequality_splitting_name_introduction])).
+tff(f34, plain, (! [X0: s_a0] : (sP2(t_a2(X0)) | t_a5(X0))),
+  inference(inequality_splitting, [], [f23, f35])).
+tff(f35, plain, (~ sP2(t_a3)),
+  introduced(definition, [new_symbols(definition, [sP2])], [inequality_splitting_name_introduction])).
+tff(f36, definition, (! [X0: s_a0, X1: s_a0] : (sQ0(X0, X1) <=> X0 = X1)),
+  introduced(definition, [new_symbols(definition, [sQ0])], [equality_proxy_definition])).
+tff(f37, plain, (! [X0: s_a0] : (sQ0(t_a2(X0), t_a3) | t_a6(X0))),
+  inference(equality_proxy_replacement, [], [f24, f36])).
+tff(f38, plain, (! [X0: s_a0] : sQ0(X0, X0)),
+  inference(equality_proxy_axiom, [], [f36])).
+tff(f39, plain, (! [X0: s_a0, X1: s_a0] : (~ sQ0(X0, X1) | sQ0(X1, X0))),
+  inference(equality_proxy_axiom, [], [f36])).
+tff(f40, plain, (! [X0: s_a0, X1: s_a0, X2: s_a0] : (~ sQ0(X0, X1) | ~ sQ0(X1, X2) | sQ0(X0, X2))),
+  inference(equality_proxy_axiom, [], [f36])).
+tff(f41, plain, (! [X0: s_a0, X1: s_a0] : (~ sQ0(X0, X1) | ~ t_a6(X0) | t_a6(X1))),
+  inference(equality_proxy_axiom, [], [f36])).
+tff(f42, plain, (! [X0: s_a0] : (sF0(X0) = t_a2(X0))),
+  introduced(definition, [new_symbols(definition, [sF0])], [function_definition])).
+tff(f43, plain, (! [X0: s_a0] : t_a8(t_a2(t_a2(X0)))),
+  inference(backward_demodulation, [unifier([subs(f26,[]),subs(f25,[])]),rewritten_literal(literal(f26,0)),rewrite([equality(literal(f25,0)),from(t_a7(X0)),to(t_a2(t_a2(X0)))])], [f26,f25])).
+
+% Weakening scaffold supplies a non-unit subsumption-demodulation side.
+tff(f60, plain, (! [X0:s_a0] : (t_a8(t_a7(X0)) | t_a6(X0))), inference(weakening,[],[f26])).
+tff(f61, plain, (! [X0:s_a0] : (t_a6(X0) | t_a7(X0)=t_a2(t_a2(X0)))), inference(weakening,[],[f25])).
+tff(f62, plain, (! [X0:s_a0] : (t_a8(t_a2(t_a2(X0))) | t_a6(X0))), inference(forward_subsumption_demodulation,[unifier([subs(f60,[]),subs(f61,[])]),rewritten_literal(literal(f60,0)),rewrite([equality(literal(f61,1)),from(t_a7(X0)),to(t_a2(t_a2(X0)))])],[f60,f61])).
+tff(f63, plain, (! [X0:s_a0] : (t_a2(X0)!=t_a3 | t_a8(t_a7(t_a2(X0))))), inference(weakening,[],[f26])).
+tff(f64, plain, (! [X0:s_a0] : (t_a2(X0)!=t_a3 | t_a8(t_a7(t_a3)))), inference(inner_rewriting,[unifier([subs(f63,[])]),rewritten_literal(literal(f63,1)),rewrite([equality(literal(f63,0)),from(t_a2(X0)),to(t_a3)])],[f63])).
+tff(f65, plain, (! [X0:s_a0] : (t_a8(t_a2(t_a2(t_a3))) | t_a2(X0)!=t_a3)), inference(constrained_superposition,[unifier([subs(f26,[b(X0,t_a2(X0))]),subs(f25,[b(X0,t_a3)])]),constraints([disequality(s_a0,t_a2(X0),t_a3)]),rewritten_literal(literal(f26,0)),rewrite([equality(literal(f25,0)),from(t_a7(t_a2(X0))),to(t_a2(t_a2(t_a3)))])],[f26,f25])).
+
+tff(f50, plain, ($false),
+  inference(contradiction, [], [f43, f7])).

@@ -1,0 +1,5 @@
+% Vampire omits the declaration of a nullary formula-naming predicate.
+tff(d0,definition,(t_a0 | ~sP0),
+    introduced(definition,[new_symbols(definition,[sP0])],
+        [predicate_definition_introduction])).
+tff(f0,plain,(sP0 | ~t_a0),inference(definition_folding,[],[d0])).

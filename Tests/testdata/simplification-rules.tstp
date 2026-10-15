@@ -1,0 +1,23 @@
+% Deterministic coverage for the certificate-free rules in
+% Backend/Simplification.lean.
+%
+% f5 removes $true/$false, f6 closes f2 over its variables in the opposite
+% order, and f7 swaps the sides of an equation. The final step is deliberately
+% an unknown rule, so only f5-f7 exercise the new handlers.
+tff(type_s_a0, type, s_a0: $tType).
+tff(type_t_a0, type, t_a0: $o).
+tff(type_t_a1, type, t_a1: ((s_a0 * s_a0) > $o)).
+tff(type_t_a2, type, t_a2: (s_a0 > s_a0)).
+tff(type_t_a3, type, t_a3: s_a0).
+tff(f1, axiom, ((t_a0 & $true) | $false), file('<stdin>', 'fact1')).
+tff(f2, axiom, (! [X0: s_a0] : (! [X1: s_a0] : t_a1(X0, X1))), file('<stdin>', 'fact2')).
+tff(f3, axiom, (t_a0 => (t_a2(t_a3) = t_a3)), file('<stdin>', 'fact3')).
+tff(f4, axiom, ((~ t_a1(t_a3, t_a3)) | (~ (t_a3 = t_a2(t_a3)))), file('<stdin>', 'fact4')).
+tff(f5, plain, (t_a0),
+  inference(true_and_false_elimination, [], [f1])).
+tff(f6, plain, (! [X1: s_a0, X0: s_a0] : t_a1(X0, X1)),
+  inference(closure, [], [f2])).
+tff(f7, plain, (t_a0 => (t_a3 = t_a2(t_a3))),
+  inference(reorient_equations, [], [f3])).
+tff(f8, plain, ($false),
+  inference(contradiction, [], [f4, f5, f6, f7])).

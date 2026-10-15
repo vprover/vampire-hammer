@@ -1,0 +1,19 @@
+% Internal definition predicates from Signature::getFnDef/getBoolDef.
+tff(sort, type, s_a0: $tType).
+tff(fun, type, t_a0: s_a0 > s_a0).
+tff(constant, type, t_a2: s_a0).
+tff(pred, type, t_a1: s_a0 > $o).
+tff(fn_wrapper, type, sFN_t_a0: (s_a0 * s_a0) > $o).
+tff(pred_wrapper, type, sPN_t_a1: s_a0 > $o).
+tff(f1, axiom, (! [X0: s_a0]: sFN_t_a0(t_a0(t_a0(X0)),t_a0(X0))), file('<stdin>','fact1')).
+tff(f2, axiom, (! [X0: s_a0]: (~sFN_t_a0(t_a0(t_a0(X0)),t_a0(X0)) | sPN_t_a1(X0))), file('<stdin>','fact2')).
+tff(f3, axiom, (~sPN_t_a1(t_a2)), file('<stdin>','fact3')).
+tff(f4, plain, (! [X0: s_a0]: sFN_t_a0(t_a0(t_a0(X0)),t_a0(X0))), inference(cnf_transformation,[],[f1])).
+tff(f5, plain, (! [X0: s_a0]: (~sFN_t_a0(t_a0(t_a0(X0)),t_a0(X0)) | sPN_t_a1(X0))), inference(cnf_transformation,[],[f2])).
+tff(f6, plain, (~sPN_t_a1(t_a2)), inference(cnf_transformation,[],[f3])).
+tff(f11, plain, (! [X0: s_a0]: t_a0(t_a0(X0))=t_a0(X0)), inference(definition_unfolding,[],[f4])).
+% Also check literal reordering while removing both wrapper kinds.
+tff(f12, plain, (! [X0: s_a0]: (t_a1(X0) | t_a0(t_a0(X0))!=t_a0(X0))), inference(definition_unfolding,[],[f5])).
+tff(f13, plain, (~t_a1(t_a2)), inference(definition_unfolding,[],[f6])).
+tff(f20, plain, t_a1(t_a2), inference(resolution,[unifier([subs(f11,[b(X0,t_a2)]),subs(f12,[b(X0,t_a2)])]),resolved_literals([literal(f11,0),literal(f12,1)])],[f11,f12])).
+tff(f21, plain, $false, inference(resolution,[unifier([subs(f20,[]),subs(f13,[])]),resolved_literals([literal(f20,0),literal(f13,0)])],[f20,f13])).

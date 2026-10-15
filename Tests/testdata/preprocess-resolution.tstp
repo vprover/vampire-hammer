@@ -1,0 +1,15 @@
+% The first resolution parent selects its middle literal. Resolution retains
+% that position, so its natural tail order is a | c | d. The displayed r clause
+% is deliberately c | a | d, requiring one separate output AC bridge.
+tff(type_s, type, s: $tType).
+tff(type_a, type, a: $o).
+tff(type_b, type, b: $o).
+tff(type_c, type, c: $o).
+tff(type_d, type, d: $o).
+tff(p, axiom, (a | b | c), file('<stdin>', 'fact0')).
+tff(n, axiom, (~ b | d), file('<stdin>', 'fact1')).
+tff(r, plain, (c | a | d),
+  inference(resolution,
+    [unifier([subs(p, []), subs(n, [])]),
+     resolved_literals([literal(p, 1), literal(n, 0)])],
+    [p, n])).

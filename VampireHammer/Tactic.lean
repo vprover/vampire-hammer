@@ -432,6 +432,10 @@ private def decomposesGoal (hints : TSyntax ``Auto.hints) : TacticM Bool := do
 private def captureGoal (hints : TSyntax ``Auto.hints) (uords : Array (TSyntax `Auto.uord)) :
     TacticM Unit := do
   if vampire.parallel.get (← getOptions) then
+    let processors := Processors.budget (← getOptions)
+    let decomposes ← decomposesGoal hints
+    let (directProcessors, splitProcessors) := if decomposes && processors > 1 then
+      Processors.split processors else (processors, processors)
     let tacticContext ← read
     let tacticState ← get
     let termContext ← readThe Term.Context
@@ -447,10 +451,13 @@ private def captureGoal (hints : TSyntax ``Auto.hints) (uords : Array (TSyntax `
           (if destination.isEmpty then "" else destination ++ ".split")) do
         unless ← tryDecomposedGoal hints uords budget do
           throwError "Parallel goal decomposition did not close the goal"
-    let actions := if ← decomposesGoal hints then #[main, split] else #[main]
+    let main := withOptions (Processors.withBudget · directProcessors) main
+    let split := withOptions (Processors.withBudget · splitProcessors) split
+    let actions := if decomposes then #[main, split] else #[main]
     let workers := actions.map fun action =>
       ((action tacticContext).run tacticState).run termContext termState
-    let ((_, tacticState), termState) ← raceMeta workers
+    let ((_, tacticState), termState) ← if processors > 1 then raceMeta workers
+      else firstSuccessfulMeta workers
     set tacticState
     set termState
     return

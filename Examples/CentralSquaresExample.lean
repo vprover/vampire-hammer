@@ -46,8 +46,7 @@ theorem centralSquares_manual
 theorem centralSquares
     (h : ∀ x y : G, Commute (x * x) y) (a b c : G) :
     Commute (a * b * a⁻¹ * b⁻¹) c := by
-  vampire [h, mul_assoc, one_mul, mul_one,
-    inv_mul_cancel, mul_inv_cancel]
+  vampire
 
 #print axioms centralSquares_manual
 #print axioms centralSquares

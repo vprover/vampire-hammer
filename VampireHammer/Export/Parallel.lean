@@ -4,6 +4,19 @@ namespace VampireHammer.Export.Internal
 
 open Lean Meta
 
+/-- On a single allocated processor, retain both alternatives without running
+two provers at once. A failed attempt restores the complete Lean state. -/
+def firstSuccessfulMeta (actions : Array (MetaM α)) : MetaM α := do
+  let saved ← saveState
+  let mut errors := #[]
+  for action in actions do
+    try return ← action
+    catch error =>
+      if error.isInterrupt || error.isRuntime then throw error
+      errors := errors.push error.toMessageData
+      saved.restore
+  throwError m!"All sequential Vampire attempts failed:\n{MessageData.joinSep errors.toList m!"\n"}"
+
 /-- Race isolated metavariable states. Only a successful worker's complete state
 is committed. Fresh names are split by `wrapAsync`; cancellation reaches external
 processes through the worker's token. All workers are joined before returning. -/

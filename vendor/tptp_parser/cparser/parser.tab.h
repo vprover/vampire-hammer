@@ -59,9 +59,12 @@ extern int yydebug;
   typedef struct {
     bool error;
     lean_object *result;
+    /* Lookahead is needed only for Vampire FOF records containing FOOL. */
+    struct TptpLexToken *tokens;
+    size_t token_count, token_next;
   } TptpParseContext;
 
-#line 65 "parser.tab.h"
+#line 68 "parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -157,12 +160,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 97 "parser.y"
+#line 101 "parser.y"
 
   char *raw;
   lean_object *data;
 
-#line 166 "parser.tab.h"
+#line 169 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -176,14 +179,15 @@ typedef union YYSTYPE YYSTYPE;
 int yyparse (yyscan_t scanner, TptpParseContext *context);
 
 /* "%code provides" blocks.  */
-#line 83 "parser.y"
+#line 86 "parser.y"
 
   int yylex(YYSTYPE *value, yyscan_t scanner);
   int yylex_init_extra(TptpParseContext *context, yyscan_t *scanner);
   int yylex_destroy(yyscan_t scanner);
+  void tptp_lexer_cleanup(yyscan_t scanner);
   void yyset_in(FILE *input, yyscan_t scanner);
   void yyerror(yyscan_t scanner, TptpParseContext *context, const char *message);
 
-#line 188 "parser.tab.h"
+#line 192 "parser.tab.h"
 
 #endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */

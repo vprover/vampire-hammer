@@ -54,8 +54,8 @@ register_option vampire.use_portfolio : Bool := {
 }
 
 register_option vampire.portfolioCores : Nat := {
-  defValue := 1
-  descr := "Number of Vampire portfolio workers (0 uses all available cores); applies when use_portfolio is true and strategy is empty"
+  defValue := 0
+  descr := "Maximum workers per FO portfolio (0 fills its processor allocation); parallel search reserves one processor for HO and divides processors between direct and split searches"
 }
 
 register_option vampire.parallel : Bool := {

@@ -236,7 +236,7 @@ def checkFact (atomTypes etomTypes nonemptySorts : Array LamSort)
 /-- Export monomorphic, many-sorted first-order logic with equality as TF0.
 No facts are silently dropped. Original atom/etom and fact IDs are retained. -/
 def exportProblem (atomTypes etomTypes nonemptySorts : Array LamSort)
-    (facts : Array LamTerm) : Except String Problem := do
+    (facts : Array LamTerm) (negatedConjectures : Array Bool := #[]) : Except String Problem := do
   let action : ExportM (Array (String × LamTerm) × Array String) := do
     let mut entries := #[]
     let mut lines := #[]
@@ -252,7 +252,8 @@ def exportProblem (atomTypes etomTypes nonemptySorts : Array LamSort)
       let formula ← try render (.base .prop) fact catch message =>
         fail s!"could not render post-preprocessing source {name}: {message}\nLamTerm: {repr fact}"
       entries := entries.push (name, fact)
-      lines := lines.push s!"tff({name}, axiom, {formula})."
+      let role := if negatedConjectures[i]?.getD false then "negated_conjecture" else "axiom"
+      lines := lines.push s!"tff({name}, {role}, {formula})."
     return (entries, lines)
   let ((entries, lines), st) ←
     (action.run {atomTypes, etomTypes, nonemptySorts}).run {}

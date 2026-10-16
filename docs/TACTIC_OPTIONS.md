@@ -49,8 +49,8 @@ local hypotheses. They are separate from settings.
 ## Parallel search
 
 ```lean
-vampire [h₁, h₂]                       -- parallel, one worker per portfolio
-vampire (portfolioCores := 2) [h₁, h₂] -- parallel, two workers per portfolio
+vampire [h₁, h₂]                       -- automatically allocate all processors
+vampire (portfolioCores := 2) [h₁, h₂] -- cap each FO portfolio at two workers
 ```
 
 `parallel` is enabled by default and overrides the sliced schedule. The original goal shares one
@@ -68,14 +68,24 @@ than a percentage slice; split leaves share their attempt's allowance.
 apply to preparation and replay. Slice percentages, decomposition reserves,
 plain/library-suggestion slices and `monoHeartbeats` are unused in this mode.
 
-`portfolioCores` controls Vampire's `--cores` in FO portfolio mode: `1` keeps
-one worker, a larger number enables concurrent workers, and `0` uses all
-available cores. It applies with or without `parallel`. Native HO uses a
+`portfolioCores` controls Vampire's `--cores` in FO portfolio mode. Its default,
+`0`, fills the search's processor allocation. A positive value caps each FO
+portfolio at that many workers, within its allocation. It applies with or
+without `parallel`. Native HO uses a
 single search process. In single-route mode, an explicit encoded strategy
 also uses one process. In parallel mode, an encoded strategy applies to HO;
 FO uses its default search configuration, as in routed search.
-With parallel goal decomposition, both the original goal and the current
-split leaf can each run a portfolio and an HO process concurrently.
+Parallel search reserves one processor for HO and gives the remaining processors
+to the FO portfolio. With concurrent goal decomposition, the available processors
+are divided between direct and split search, with the extra processor going to
+direct search when the total is odd. Each attempt reserves one of its processors
+for HO; split leaves run sequentially and reuse the split search's allocation.
+For example, 24 processors give an unsplit search 23 FO workers and one HO process,
+or each of the direct and split searches 11 FO workers and one HO process.
+An attempt allocated only one processor tries FO and then HO sequentially; on a
+single-processor machine direct and split attempts are sequential too. With
+`parallel := false`, the portfolio can use all processors, subject to an explicit
+`portfolioCores` cap, because there is no concurrent HO search.
 
 When `outputPath` is set, parallel routes use `.fo.p` and `.ho.p` suffixes.
 The decomposition attempt adds `.split.branch-N.p` before the route suffix,
@@ -148,7 +158,7 @@ timings. Cache hits do not launch Vampire or rewrite its output artifacts.
 | `vampire.higherOrderSearchRetry` | `Bool` | `true` | Retry a fast native HO GaveUp with extensionality and heuristic instantiation, using only unspent search time |
 | `vampire.strategy` | `String` | `""` | Encoded strategy passed to Vampire with `--decode` |
 | `vampire.use_portfolio` | `Bool` | `true` | Use Vampire portfolio mode when vampire.strategy is empty |
-| `vampire.portfolioCores` | `Nat` | `1` | Number of Vampire portfolio workers (0 uses all available cores); applies when use_portfolio is true and strategy is empty |
+| `vampire.portfolioCores` | `Nat` | `0` | Maximum workers per FO portfolio; 0 fills its allocation after reserving HO processors and dividing concurrent direct/split searches |
 | `vampire.satPrecheck` | `Nat` | `0` | Finite model building run before proof search, in deciseconds (0 disables) |
 | `vampire.plainSliceShare` | `Nat` | `50` | Percentage of the search budget for the attempt without library suggestions |
 

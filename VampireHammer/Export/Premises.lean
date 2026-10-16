@@ -42,6 +42,9 @@ def typeclassLawLabel : String := "typeclass law "
 /-- Label prefix for optional laws stored in ordinary local records. -/
 def structureLawLabel : String := "structure law "
 
+/-- The required negated goal, preserved through checked source transformations. -/
+def negatedGoalLabel : String := "vampire required negated goal"
+
 /-- Maximum number of instantiations per projected law. -/
 private def maxLawInstantiations : Nat := 3
 
@@ -412,7 +415,7 @@ def collectFactsWithTypeclassLaws
   -- the optional-local prefix so the subset retry cannot omit the target.
   let lemmas := lemmas.map fun lemma =>
     if lemma.proof == mkFVar negHyp then
-      { lemma with deriv := .leaf "vampire required negated goal" }
+      { lemma with deriv := .leaf negatedGoalLabel }
     else lemma
   let inhs := inhs ++ hintInhabitants
   let lemmas ← liftMetaM <| lemmas.mapM lowerDefeqNatCastsInLemma

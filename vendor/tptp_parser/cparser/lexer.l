@@ -1,5 +1,10 @@
 %{
   #include <stdbool.h>
+  #include <stdlib.h>
+  #include <string.h>
+
+  /* Keep the generated scanner separate from the token lookahead adapter. */
+  #define YY_DECL static int tptp_lex(YYSTYPE *yylval_param, yyscan_t yyscanner)
 
   #include <lean/lean.h>
 
@@ -68,7 +73,7 @@ comment {comment_line}|{comment_block}
 %option extra-type="TptpParseContext *"
 
 %%
-[ \t\n]+ ;
+[ \t\r\n]+ ;
 {comment} ;
 
 "!" { return TOK_EXCLAMATION; }
@@ -117,7 +122,7 @@ comment {comment_line}|{comment_block}
 "cnf(" { return TOK_CNF_PARENOPEN; }
 "creator(" { return TOK_CREATOR_PARENOPEN; }
 "file(" { return TOK_FILE_PARENOPEN; }
-"fof(" { return TOK_FOF_PARENOPEN; }
+"fof"[ \t\r\n]*"(" { return TOK_FOF_PARENOPEN; }
 "include(" { return TOK_INCLUDE_PARENOPEN; }
 "inference(" { return TOK_INFERENCE_PARENOPEN; }
 "introduced(" { return TOK_INTRODUCED_PARENOPEN; }
@@ -155,3 +160,82 @@ comment {comment_line}|{comment_block}
 . { yyextra->error = true; }
 
 %%
+
+/* Buffer only the formula of a fof record. Vampire's FOOL extension needs
+ * the TFF grammar for formula-valued $ite arguments. Tokens are scanned once;
+ * no text is copied or rewritten, and TFF/THF proofs take the direct path.
+ * Quoted names, comments and annotations cannot trigger promotion. */
+typedef struct TptpLexToken {
+  int kind;
+  YYSTYPE value;
+} TptpLexToken;
+
+static bool raw_token(int kind) {
+  switch (kind) {
+    case TOK_SINGLE_QUOTED: case TOK_BACK_QUOTED: case TOK_DISTINCT_OBJECT:
+    case TOK_DOLLAR_WORD: case TOK_DOLLAR_DOLLAR_WORD: case TOK_UPPER_WORD:
+    case TOK_LOWER_WORD: case TOK_REAL: case TOK_RATIONAL: case TOK_INTEGER:
+      return true;
+    default: return false;
+  }
+}
+
+void tptp_lexer_cleanup(yyscan_t scanner) {
+  TptpParseContext *context = yyget_extra(scanner);
+  for (size_t i = context->token_next; i < context->token_count; ++i) {
+    if (raw_token(context->tokens[i].kind)) free(context->tokens[i].value.raw);
+  }
+  free(context->tokens);
+  context->tokens = NULL;
+  context->token_count = context->token_next = 0;
+}
+
+int yylex(YYSTYPE *value, yyscan_t scanner) {
+  TptpParseContext *context = yyget_extra(scanner);
+  if (context->token_next < context->token_count) {
+    TptpLexToken token = context->tokens[context->token_next++];
+    *value = token.value;
+    return token.kind;
+  }
+  tptp_lexer_cleanup(scanner);
+  int kind = tptp_lex(value, scanner);
+  if (kind != TOK_FOF_PARENOPEN) return kind;
+
+  size_t capacity = 0;
+  int depth = 1, brackets = 0, commas = 0;
+  bool conditional = false, previous_ite = false;
+  for (;;) {
+    YYSTYPE next = {0};
+    int token = tptp_lex(&next, scanner);
+    if (context->token_count == capacity) {
+      size_t grown = capacity ? capacity * 2 : 64;
+      TptpLexToken *buffer = realloc(context->tokens, grown * sizeof(*buffer));
+      if (!buffer) {
+        if (raw_token(token)) free(next.raw);
+        context->error = true;
+        return 0;
+      }
+      context->tokens = buffer;
+      capacity = grown;
+    }
+    context->tokens[context->token_count++] = (TptpLexToken){token, next};
+    if (commas == 2 && previous_ite && token == TOK_PARENOPEN) conditional = true;
+    previous_ite = token == TOK_DOLLAR_WORD && strcmp(next.raw, "ite") == 0;
+    switch (token) {
+      case TOK_PARENOPEN: case TOK_DOLLAR_LET_PARENOPEN:
+      case TOK_DOLLAR_CNF_PARENOPEN: case TOK_DOLLAR_FOF_PARENOPEN:
+      case TOK_DOLLAR_FOT_PARENOPEN: case TOK_DOLLAR_TFF_PARENOPEN:
+      case TOK_DOLLAR_THF_PARENOPEN:
+        ++depth; break;
+      case TOK_PARENCLOSE: --depth; break;
+      case TOK_BRACKOPEN: ++brackets; break;
+      case TOK_BRACKCLOSE: --brackets; break;
+      case TOK_COMMA:
+        if (depth == 1 && brackets == 0) ++commas;
+        break;
+      default: break;
+    }
+    if (!token || token == TOK_PLOSE_DOT || commas == 3) break;
+  }
+  return conditional ? TOK_TFF_PARENOPEN : TOK_FOF_PARENOPEN;
+}

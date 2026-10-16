@@ -17,6 +17,13 @@ namespace VampireHammer.Export.Internal
 
 open Lean Meta Elab Tactic
 
+/-- Preserve goal provenance through transformations of the negated goal alone.
+An arbitrary negative hypothesis, or a consequence mixing goal and premises,
+must not be identified as the original conjecture. -/
+private partial def derivesOnlyFromNegatedGoal : Auto.DTr → Bool
+  | .leaf label => label == negatedGoalLabel
+  | .node _ premises => !premises.isEmpty && premises.all derivesOnlyFromNegatedGoal
+
 /-- Convert already reified and preprocessed first-order facts to the project
 TF0 representation. Keeping this inside `LamReif.ReifM` preserves the precise
 lean-auto atom valuation needed by replay. -/
@@ -29,8 +36,12 @@ def exportPreprocessedFacts (facts : Array Auto.Embedding.Lam.REntry) :
   let varTys := (← Auto.LamReif.getVarVal).map Prod.snd
   let evarTys ← Auto.LamReif.getLamEVarTy
   let nonemptySorts := (← Auto.LamReif.getRst).nonemptyMap.toArray.map Prod.fst
-  let exporter := if vampire.higherOrder.get (← getOptions) then THF.exportProblem else TFF.exportProblem
-  match exporter varTys evarTys nonemptySorts terms with
+  let negatedConjectures ← facts.mapM fun fact =>
+    derivesOnlyFromNegatedGoal <$> Auto.LamReif.collectDerivFor fact
+  let exported := if vampire.higherOrder.get (← getOptions) then
+    THF.exportProblem varTys evarTys nonemptySorts terms negatedConjectures
+  else TFF.exportProblem varTys evarTys nonemptySorts terms negatedConjectures
+  match exported with
   | .ok problem => pure problem
   | .error message =>
     -- Name the Lean type of an uninhabited sort; `s_aN` alone is opaque.

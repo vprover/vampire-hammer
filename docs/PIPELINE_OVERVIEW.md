@@ -21,8 +21,10 @@ lean-auto provides monomorphization, reification and checked preprocessing.
 TF0 is the typed first-order format; THF preserves supported higher-order
 terms. By default the routes race after shared monomorphization, alongside a
 goal-decomposition attempt when applicable. Only the first successful replay
-is committed; other attempts are cancelled. Vampire portfolios independently
-default to one worker each (`portfolioCores`). Set `parallel := false` to use
+is committed; other attempts are cancelled. By default the FO portfolio uses
+all processors remaining after reserving one for HO. Concurrent direct and
+split searches divide the processor budget; `portfolioCores` can cap each
+portfolio. Set `parallel := false` to use
 the sequential schedule with a shared search budget.
 
 Replay checks source facts and reconstructs derived nodes from their parents.

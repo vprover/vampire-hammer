@@ -75,6 +75,7 @@ LEAN_EXPORT lean_object *Tptp_cparse_parse_file(lean_obj_arg filename) {
   }
   yyset_in(input, scanner);
   int status = yyparse(scanner, &context);
+  tptp_lexer_cleanup(scanner);
   yylex_destroy(scanner);
   fclose(input);
   return parse_result(&context, status);
@@ -98,6 +99,7 @@ LEAN_EXPORT lean_object *Tptp_cparse_parse_string(b_lean_obj_arg text) {
   YY_BUFFER_STATE buffer = yy_scan_bytes(lean_string_cstr(text), (int)length, scanner);
   int status = yyparse(scanner, &context);
   yy_delete_buffer(buffer, scanner);
+  tptp_lexer_cleanup(scanner);
   yylex_destroy(scanner);
   return parse_result(&context, status);
 }

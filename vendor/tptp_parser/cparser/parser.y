@@ -77,6 +77,9 @@ lean_object * parse_real(const char *s_input) {
   typedef struct {
     bool error;
     lean_object *result;
+    /* Lookahead is needed only for Vampire FOF records containing FOOL. */
+    struct TptpLexToken *tokens;
+    size_t token_count, token_next;
   } TptpParseContext;
 }
 
@@ -84,6 +87,7 @@ lean_object * parse_real(const char *s_input) {
   int yylex(YYSTYPE *value, yyscan_t scanner);
   int yylex_init_extra(TptpParseContext *context, yyscan_t *scanner);
   int yylex_destroy(yyscan_t scanner);
+  void tptp_lexer_cleanup(yyscan_t scanner);
   void yyset_in(FILE *input, yyscan_t scanner);
   void yyerror(yyscan_t scanner, TptpParseContext *context, const char *message);
 }
@@ -540,7 +544,17 @@ thf_and_formula:
   ;
 
 thf_apply_formula:
-  thf_unit_formula "@" thf_unit_formula { $$ = Tptp_mk_ThfApplyFormula_thfUnitFormulaThfUnitFormula($1, $3); }
+  /* Vampire omits the connective's own parentheses in (= @ X). Build
+   * exactly the same head as ((=) @ X), including in $thf annotations. */
+  infix_equality "@" thf_unit_formula {
+    lean_object *head = Tptp_mk_ThfUnitFormula_thfUnitaryFormula(
+      Tptp_mk_ThfUnitaryFormula_thfAtomicFormula(
+        Tptp_mk_ThfAtomicFormula_thfDefinedAtomic(
+          Tptp_mk_ThfDefinedAtomic_thfConnTerm(
+            Tptp_mk_ThfConnTerm_infixEquality($1)))));
+    $$ = Tptp_mk_ThfApplyFormula_thfUnitFormulaThfUnitFormula(head, $3);
+  }
+  | thf_unit_formula "@" thf_unit_formula { $$ = Tptp_mk_ThfApplyFormula_thfUnitFormulaThfUnitFormula($1, $3); }
   | thf_apply_formula "@" thf_unit_formula { $$ = Tptp_mk_ThfApplyFormula_thfApplyFormulaThfUnitFormula($1, $3); }
   ;
 
@@ -551,7 +565,19 @@ thf_unit_formula:
   ;
 
 thf_preunit_formula:
-  thf_unitary_formula { $$ = Tptp_mk_ThfPreunitFormula_thfUnitaryFormula($1); }
+  /* Vampire's ~ a = b denotes ~ (a = b). */
+  thf_defined_infix {
+    $$ = Tptp_mk_ThfPreunitFormula_thfUnitaryFormula(
+      Tptp_mk_ThfUnitaryFormula_thfLogicFormula(
+        Tptp_mk_ThfLogicFormula_thfDefinedInfix($1)));
+  }
+  | thf_infix_unary {
+    $$ = Tptp_mk_ThfPreunitFormula_thfUnitaryFormula(
+      Tptp_mk_ThfUnitaryFormula_thfLogicFormula(
+        Tptp_mk_ThfLogicFormula_thfUnaryFormula(
+          Tptp_mk_ThfUnaryFormula_thfInfixUnary($1))));
+  }
+  | thf_unitary_formula { $$ = Tptp_mk_ThfPreunitFormula_thfUnitaryFormula($1); }
   | thf_prefix_unary { $$ = Tptp_mk_ThfPreunitFormula_thfPrefixUnary($1); }
   ;
 
@@ -793,7 +819,19 @@ tff_unit_formula:
   ;
 
 tff_preunit_formula:
-  tff_unitary_formula { $$ = Tptp_mk_TffPreunitFormula_tffUnitaryFormula($1); }
+  /* Vampire's ~ a = b denotes ~ (a = b). */
+  tff_defined_infix {
+    $$ = Tptp_mk_TffPreunitFormula_tffUnitaryFormula(
+      Tptp_mk_TffUnitaryFormula_tffLogicFormula(
+        Tptp_mk_TffLogicFormula_tffDefinedInfix($1)));
+  }
+  | tff_infix_unary {
+    $$ = Tptp_mk_TffPreunitFormula_tffUnitaryFormula(
+      Tptp_mk_TffUnitaryFormula_tffLogicFormula(
+        Tptp_mk_TffLogicFormula_tffUnaryFormula(
+          Tptp_mk_TffUnaryFormula_tffInfixUnary($1))));
+  }
+  | tff_unitary_formula { $$ = Tptp_mk_TffPreunitFormula_tffUnitaryFormula($1); }
   | tff_prefix_unary { $$ = Tptp_mk_TffPreunitFormula_tffPrefixUnary($1); }
   ;
 

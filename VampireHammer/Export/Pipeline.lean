@@ -367,14 +367,20 @@ private def replayParallel (lemmas inhs : Array Auto.Lemma)
   let body : Auto.Reif.ReifM Expr := do
     let reifState ← get
     let total ← budget.get
-    let actions := #[Routing.Route.higherOrder, .firstOrder].map fun route => do
+    let processors := Processors.budget options
+    let routes := if processors > 1 then #[Routing.Route.higherOrder, .firstOrder]
+      else #[Routing.Route.firstOrder, .higherOrder]
+    let actions := routes.map fun route => do
       let destination := vampire.outputPath.get options
-      withOptions (fun options => (routeOptions route options).set `vampire.outputPath
+      let allocation := match route with
+        | .higherOrder => 1
+        | .firstOrder => if processors > 1 then processors - 1 else 1
+      withOptions (fun options => (Processors.withBudget (routeOptions route options) allocation).set `vampire.outputPath
           (if destination.isEmpty then "" else destination ++ s!".{route.name}.p")) do
         let prepared ← (preparedFromState originalContext).run' reifState
         let ownBudget ← IO.mkRef total
         searchPrepared prepared ownBudget
-    liftM <| chargeSearch budget (raceMeta actions)
+    liftM <| chargeSearch budget (if processors > 1 then raceMeta actions else firstSuccessfulMeta actions)
   let (proof, _) ← monomorphizeWithOptionalFacts lemmas inhs (fun state => body state)
   return proof
 

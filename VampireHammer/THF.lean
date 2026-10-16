@@ -175,7 +175,7 @@ def checkFact (atomTypes etomTypes nonemptySorts : Array LamSort)
   unless sort == .base .prop do throw "THF export: source fact is not a proposition"
 
 def exportProblem (atomTypes etomTypes nonemptySorts : Array LamSort)
-    (facts : Array LamTerm) : Except String TFF.Problem := do
+    (facts : Array LamTerm) (negatedConjectures : Array Bool := #[]) : Except String TFF.Problem := do
   let action : ExportM (Array (String × LamTerm) × Array String) := do
     let mut entries := #[]
     let mut lines := #[]
@@ -184,7 +184,8 @@ def exportProblem (atomTypes etomTypes nonemptySorts : Array LamSort)
       let (text, sort) ← render fact
       unless sort == .base .prop do fail s!"source `{name}` is not a proposition"
       entries := entries.push (name, fact)
-      lines := lines.push s!"thf({name}, axiom, {text})."
+      let role := if negatedConjectures[index]?.getD false then "negated_conjecture" else "axiom"
+      lines := lines.push s!"thf({name}, {role}, {text})."
     pure (entries, lines)
   let ((facts, lines), state) ← (action.run { atomTypes, etomTypes, nonemptySorts }).run {}
   let sorts := state.sorts.map fun (name, _) => s!"thf(type_{name}, type, {name}: $tType)."

@@ -48,6 +48,8 @@ workers call the parser directly, bypassing the hammer's loading adapter. -/
     "cnf('quoted name',axiom,(p | ~q),inference(resolution,[status(thm)],[left,right])).\n",
     "tff(sort,type,person:$tType).\ntff(r,type,relation:(person * person)>$o).\n" ++ longInput,
     "fof(f,axiom,(! [X] : (? [Y] : (p(X,Y) <=> q(Y))))).\n",
+    "fof(f,plain,($ite((p & q),a,$ite(q,b,a)) = a)).\nfof(g,plain,p).\n",
+    "thf(f,plain,((= @ a) @ a)).\ntff(g,plain,~ a = b).\n",
     "tff(number,axiom,(f(-123,4/7,1.25E-3) = g(\"distinct\"))).\n"
   ]
   let mut paths := #[]
@@ -59,7 +61,7 @@ workers call the parser directly, bypassing the hammer's loading adapter. -/
     expected := expected.push (reprStr (← IO.ofExcept (← parseVampireTSTP parserLibrary path.toString)))
   let syntaxError := directory / "syntax-error.p"
   let lexicalError := directory / "lexical-error.p"
-  IO.FS.writeFile syntaxError "cnf(bad,axiom,(p | )).\n"
+  IO.FS.writeFile syntaxError "fof(bad,axiom,($ite(p,a,b) = )).\n"
   -- The parser can finish a complete AST before the scanner reports this error.
   IO.FS.writeFile lexicalError "cnf(good,axiom,p).\n§\n"
   let invalidPaths := #[syntaxError, lexicalError, directory / "missing-input.p"]

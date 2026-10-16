@@ -3,6 +3,7 @@ import VampireHammer.TFF
 import VampireHammer.TSTP
 import VampireHammer.Preprocess
 import VampireHammer.Export.Diagnostics
+import VampireHammer.Export.Processors
 
 /-!
 Vampire command construction, durable raw artifacts, timeout reporting, and parsing at the
@@ -79,7 +80,7 @@ private def vampireArguments (opts : Options) (timeLimitMs? : Option Nat := none
   let strategyArgs := if strategy.isEmpty then #[] else #["--decode", strategy]
   let higherOrder := vampire.higherOrder.get opts
   let mode := if !higherOrder && strategy.isEmpty && vampire.use_portfolio.get opts then "portfolio" else "vampire"
-  let cores := if mode == "portfolio" then vampire.portfolioCores.get opts else 1
+  let cores := if mode == "portfolio" then Processors.portfolioWorkers opts else 1
   -- `tptp_ac` retains associativity and commutativity steps needed for replay.
   -- AVATAR follows the scheduled strategy unless explicitly disabled.
   let avatarArgs := if higherOrder || vampire.disableAvatar.get opts then #["--avatar", "off"] else #[]

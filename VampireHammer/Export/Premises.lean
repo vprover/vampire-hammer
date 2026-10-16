@@ -1,4 +1,5 @@
 import Auto.Tactic
+import VampireHammer.FactReporting
 import VampireHammer.Replay.Diagnostics
 import VampireHammer.SourceNormalization
 import VampireHammer.UnfoldingPlan
@@ -419,9 +420,21 @@ def collectFactsWithTypeclassLaws
     else lemma
   let inhs := inhs ++ hintInhabitants
   let lemmas ← liftMetaM <| lemmas.mapM lowerDefeqNatCastsInLemma
+  if vampire.onlyFacts.get (← getOptions) then
+    -- Keep only requested propositions (and the refutation hypothesis).
+    -- In particular, do not project instance laws or add datatype/Bool facts.
+    let selected := (lemmas ++ hintInhabitants).foldl (fun ids lemma =>
+      collectFVars ids lemma.proof) {}
+    let inhs ← inhs.filterM fun fact => do
+      for id in (collectFVars {} fact.proof).fvarIds do
+        if (← isProp (← id.getType)) && !selected.fvarSet.contains id then return false
+      return true
+    let lemmas ← liftMetaM <| lemmas.mapM SourceNormalization.normalizeLemma
+    return (lemmas, inhs)
   -- Bridges match the functions as the user wrote them; normalization can
   -- expand `∏ i ∈ s, f i` into `Multiset`/`Quot` internals.
   let sourceLemmas := lemmas
+  let requestedProofs := lemmas.map (·.proof)
   -- Relevance comes from the requested source problem. Exploring every
   -- universally quantified class law would pull in unrelated attributed facts.
   let attributeLemmas ← liftMetaM <| AttributeLemmas.collect lemmas (← Term.getDeclName?)
@@ -504,6 +517,8 @@ def collectFactsWithTypeclassLaws
   let lemmas := if mentionsDecide then
       lemmas.push ⟨⟨decideSpec, decideSpecType, .leaf "decide_eq_true_eq"⟩, #[]⟩
     else lemmas
+  let lemmas := lemmas.map fun lemma =>
+    if requestedProofs.contains lemma.proof then lemma else FactReporting.markLemma lemma
   if vampire.unfoldingPlan.get (← getOptions) then
     -- One decision per definition for the whole problem; see `UnfoldingPlan`.
     let requested := exposedDefinitions ++ nestedDefinitions.filter (!exposedDefinitions.contains ·)
@@ -539,7 +554,8 @@ def collectFactsWithTypeclassLaws
     if copy.type == lemma.type || copy.type.sizeWithoutSharing > lemma.type.sizeWithoutSharing + 4096 then
       continue
     unless lemmas.any (·.type == copy.type) || expanded.any (·.type == copy.type) do
-      expanded := expanded.push copy
+      let proof := FactReporting.markUnfolded exposedDefinitions copy.type copy.proof
+      expanded := expanded.push { copy with proof }
   trace[vampire.unfold] "Added {expanded.size} definitionally expanded source facts"
   pure (lemmas ++ expanded, inhs)
 

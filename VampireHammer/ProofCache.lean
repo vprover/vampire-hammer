@@ -46,7 +46,7 @@ private def cacheOptions (options : Options) : CoreM Options := do
   let mut result : Options := {}
   for (name, value) in options do
     unless (`vampire).isPrefixOf name || (`auto).isPrefixOf name do continue
-    if name == `vampire.cache || name == `vampire.quiet then continue
+    if name == `vampire.cache || name == `vampire.quiet || name == `vampire.reportFacts then continue
     -- An explicitly supplied default is equivalent to an absent setting.
     let declaration? ← try some <$> getOptionDecl name catch _ => pure none
     if let some declaration := declaration? then

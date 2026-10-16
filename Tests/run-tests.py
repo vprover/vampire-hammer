@@ -18,6 +18,8 @@ PYTHON_TEST_DIRECTORIES = ("Tests/Python",)
 # These exercises invoke the real prover; the other regression files use
 # checked fixtures or test the metaprogramming/proof interfaces directly.
 REAL_PROVER_FILES = {
+    "FactReportingTests.lean",
+    "OnlyFactsTests.lean",
     "CentralSquaresExample.lean",
     "FoolConditionalTests.lean",
     "BoolBridgeTests.lean",

@@ -46,6 +46,46 @@ problem through `vampire.mockScript` and leaves the goal unchanged.
 Facts such as `[h₁, h₂, Nat.add_comm]` select premises; `[*]` selects all
 local hypotheses. They are separate from settings.
 
+### Restricting premises with `only`
+
+`vampire only [facts]` disables automatic premise additions, including indexed
+library lemmas, local structure/typeclass laws, synthesized law instances,
+constructor laws, Boolean facts and generated instance/definition alignment
+equations. It also disables automatic goal decomposition and domain-assumption
+recovery, which can invoke additional lemmas. Inline discovery settings cannot
+override this restriction. Ordinary `vampire` behavior is unchanged.
+
+An omitted list means `[]`, rather than all local hypotheses. Use `[*]` to
+explicitly select all local hypotheses, or `[*, lemma]` to add named facts.
+Hypotheses introduced from the goal, logical inference (including equality
+and extensionality), definitional reduction and type inhabitation remain part
+of the checked translation. `only` restricts source premises, not Lean's logic.
+Explicit `(unfold := [...])` and `(defeq := [...])` requests still apply.
+`vampire_export only` inspects the same restricted problem.
+
+For example, with a local `[Group G]`, `vampire only [h, Group.mul_assoc a]`
+does not extract the other group laws or unrestricted associativity. Supply
+every law the proof needs explicitly. `grind`/`simp` attributes on theorems have
+no effect on this mode. Cache entries for ordinary and restricted calls are
+kept separate.
+
+`vampire.onlyFacts` is an internal Boolean option (default `false`) used by
+the `only` syntax; use the syntax to enforce the complete restriction.
+
+### Suggesting a `vampire only` call
+
+`vampire.reportFacts : Bool` defaults to `true`. When a successful call used
+automatically collected premises, it shows a `Try this` suggestion:
+`vampire only (unfold := [...]) (higherOrder := ...) (strategy := "...") [hints, used facts]`.
+It contains your original hints (`*` when the list was omitted), the
+typeclass laws and attribute lemmas the completed proof used, the definitions
+that were unfolded automatically, and the winning route: first-order or
+higher-order search and, for portfolio runs, the Vampire strategy that found
+the proof (the route settings turn off the race so the strategy applies).
+Cache hits retain the same provenance. Unused collected facts and failed
+parallel attempts are not suggested. Use `(reportFacts := false)` to hide it.
+Explicitly supplied theorems are not expanded to their own dependencies.
+
 ## Parallel search
 
 ```lean

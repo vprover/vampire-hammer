@@ -3,6 +3,7 @@ import VampireHammer.Export.Process
 import VampireHammer.Export.Routing
 import VampireHammer.Export.Parallel
 import VampireHammer.Replay
+import VampireHammer.FactReporting
 
 /-!
 The capture pipeline: checked source rewriting and monomorphization, reification, TF0 export,
@@ -88,6 +89,7 @@ private def replayVampireOnce (lemmas inhs : Array Auto.Lemma)
     (searchBudget : IO.Ref Nat) (satisfiable : IO.Ref Bool)
     (monoBudget? : Option (IO.Ref Nat) := none) : MetaM Expr := do
   let originalContext ← getLCtx
+  let strategy ← IO.mkRef (none : Option String)
   let (proof, _) ← withMonoDeadline (fun resume =>
     monomorphizeWithOptionalFacts lemmas inhs (fun state => resume <| (@id (Auto.Reif.ReifM Expr) do
     let state ← get
@@ -113,7 +115,10 @@ private def replayVampireOnce (lemmas inhs : Array Auto.Lemma)
                 s!"\nFinite model building output was saved in {destination}.fmb.stdout."
               throwError "Vampire did not produce a refutation (SZS status Satisfiable).{saved}"
           withOptions (fun options => options.set `vampire.timeLimit seconds) <|
-            invokeVampire problem satisfiable
+            do
+              let (parsed, found) ← invokeVampireStrategy problem satisfiable
+              strategy.set found
+              pure parsed
         finally
           let elapsed := (← IO.monoMsNow) - searchStart
           searchBudget.modify (· - elapsed))
@@ -124,7 +129,7 @@ private def replayVampireOnce (lemmas inhs : Array Auto.Lemma)
         trace[vampire] "Decoded {decoded.steps.size} Vampire proof steps and {decoded.derivedSymbols.size} proof-local symbols into lean-auto LamTerms")
       let proof ← Replay.replay problem decoded exportInhs exportFacts
       let proof ← liftM <| closeMonomorphizationProof originalContext proof
-      pure (Replay.markReconstruction problem.higherOrder proof)
+      pure (FactReporting.markStrategy (← strategy.get) (Replay.markReconstruction problem.higherOrder proof))
       : Auto.LamReif.ReifM Expr).run' {u := maxLevel}) state)) monoBudget?
   pure proof
 
@@ -307,8 +312,9 @@ private def replayStaged (lemmas inhs : Array Auto.Lemma)
               throwError "Vampire did not produce a refutation (SZS status Satisfiable); continuing with native HO"
           let firstOrder := min (← budget.get) (total * 25 / 100)
           if firstOrder < 100 then throwError "Vampire proof-search budget exhausted"
-          let parsed ← chargeSearch budget <| invokeVampire prepared.problem none (some firstOrder)
-          prepared.replay parsed
+          let (parsed, strategy) ← chargeSearch budget <|
+            invokeVampireStrategy prepared.problem none (some firstOrder)
+          return FactReporting.markStrategy strategy (← prepared.replay parsed)
       catch error =>
         if error.isInterrupt || error.isRuntime then throw error
         saved.restore
@@ -327,8 +333,9 @@ private def replayStaged (lemmas inhs : Array Auto.Lemma)
         withOptions hoOptions do
           let remaining ← budget.get
           if remaining < 100 then throwError "Vampire proof-search budget exhausted"
-          let parsed ← chargeSearch budget <| invokeVampire prepared.problem none (some remaining)
-          prepared.replay parsed
+          let (parsed, strategy) ← chargeSearch budget <|
+            invokeVampireStrategy prepared.problem none (some remaining)
+          return FactReporting.markStrategy strategy (← prepared.replay parsed)
     )
   finally
     if let some (cancel, _) := background? then cancel
@@ -351,9 +358,9 @@ private def searchPrepared (prepared : PreparedQuery) (budget : IO.Ref Nat)
       throwError "Vampire did not produce a refutation (SZS status Satisfiable)"
   let remaining ← budget.get
   if !unlimited && remaining < 100 then throwError "Vampire proof-search budget exhausted"
-  let parsed ← chargeSearch budget <|
-    invokeVampire prepared.problem none (if unlimited then none else some remaining) alternateHO
-  prepared.replay parsed
+  let (parsed, strategy) ← chargeSearch budget <|
+    invokeVampireStrategy prepared.problem none (if unlimited then none else some remaining) alternateHO
+  return FactReporting.markStrategy strategy (← prepared.replay parsed)
 
 /-- Monomorphize once, then independently export, search and replay both
 representations. Each worker gets the whole remaining search allowance. -/

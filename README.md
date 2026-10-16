@@ -38,7 +38,17 @@ example (p q : α → Prop) (a : α) (h₁ : ∀ x, p x → q x) (h₂ : p a) : 
 
 Use `vampire [*]` for all local hypotheses. Per-call settings include
 `(timeout := 20)`, `(quiet := false)`, `(unfold := [f])` and `(defeq := [f])`.
-Successful calls are silent by default; `(quiet := false)` enables a success message.
+`(quiet := false)` enables a general success message. If a successful proof
+uses automatically added premises, VampireHammer reports their origins and
+statements, including on cache hits. Use `(reportFacts := false)` to hide this
+report. Unused automatic premises are not reported.
+
+Use `vampire only [h₁, h₂, lemma]` to restrict the tactic to supplied facts.
+This disables automatic library lemmas, structure/typeclass laws, constructor
+facts and Boolean facts. `vampire only` means `vampire only []`;
+`vampire only [*]` explicitly includes local hypotheses. Hypotheses introduced
+from the goal, logical inference and definitional reduction remain available.
+The same restriction is available with `vampire_export only`.
 
 The default search allowance is 10 seconds per parallel attempt.
 Translation and reconstruction also use Lean's heartbeat
@@ -54,12 +64,6 @@ portfolio; this also works with the sequential tactic schedule.
 The independent `portfolioCores` setting defaults to `1` per portfolio.
 Use `(parallel := false)` to select the sequential tactic schedule.
 
-Completed Lean proofs are cached in memory during the Lean session. Repeated
-matching calls reuse the checked proof, skipping preparation, search and replay.
-Use `(cache := false)` to force a fresh run, or `set_option trace.vampire.cache true`
-to see cache hits and misses. See [cache details](docs/TACTIC_OPTIONS.md#session-proof-cache).
-
-`vampire_export` exports a problem without proving the goal.
 Set `vampire.outputPath` to retain the input and prover output, or
 `trace.vampire` for diagnostics. Set `vampire.executable` to use another
 certificate-emitting Vampire build.

@@ -1,4 +1,5 @@
 import Auto.Tactic
+import VampireHammer.Options
 import VampireHammer.Replay.Diagnostics
 import VampireHammer.Export.SearchBudget
 
@@ -211,8 +212,10 @@ private def proveWithoutTranslationCore (target : Expr) (facts : Array Auto.Lemm
           return some proof
     catch _ => pure ()
     saved.restore
-  if let some proof ← proveSelectedConstructorClash? target facts then return some proof
+  if !vampire.onlyFacts.get (← getOptions) then
+    if let some proof ← proveSelectedConstructorClash? target facts then return some proof
   if let some proof ← proveBySelectedSubstitution? target facts then return some proof
+  if vampire.onlyFacts.get (← getOptions) then return none
   proveConstructorEquivalence? target
 
 /-- Optional direct closure shares one budget across reflexivity, applications,

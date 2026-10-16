@@ -1,4 +1,5 @@
 import Auto.Tactic
+import VampireHammer.Options
 import VampireHammer.Replay.Diagnostics
 import VampireHammer.Export.SearchBudget
 
@@ -56,11 +57,13 @@ the exported formulas. Search only their applications, with bounds on depth,
 arity and candidate attempts. Failed matches restore all metavariable state. -/
 partial def localDomainWitness (type : Expr) (candidates : Array Expr)
     (budget : IO.Ref Nat) (depth : Nat) : MetaM (Option Expr) := do
-  if let some witness ← Auto.Meta.trySynthInhabited type then return some witness
+  let onlyFacts := vampire.onlyFacts.get (← getOptions)
+  unless onlyFacts do
+    if let some witness ← Auto.Meta.trySynthInhabited type then return some witness
   -- Inhabited itself can be a first-order domain (e.g. a hypothesis
   -- Inhabited α → P). A real Nonempty α justifies constructing its dictionary;
   -- a binder from a quantified premise must never stand in for that value.
-  if type.isAppOfArity ``Inhabited 1 then
+  if !onlyFacts && type.isAppOfArity ``Inhabited 1 then
     let domain := type.getAppArgs[0]!
     let nonempty ← mkAppM ``Nonempty #[domain]
     if let .some proof ← trySynthInstance nonempty then
@@ -123,6 +126,10 @@ partial def deriveDomainInhabitants (shared? : Option Export.SearchAllowance := 
   unless missingTypes.isEmpty do
     for decl in (← getLCtx) do
       unless decl.isImplementationDetail do
+        -- Unselected proof hypotheses must not supply hidden existential or
+        -- Nonempty witnesses in `only` mode. Selected witnesses are already
+        -- registered in the reification state.
+        if vampire.onlyFacts.get (← getOptions) && (← isProp decl.type) then continue
         localWitnesses := localWitnesses.push (mkFVar decl.fvarId)
         let type ← whnf decl.type
         if type.isAppOf ``Exists then

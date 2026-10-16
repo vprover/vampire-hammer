@@ -194,6 +194,19 @@ def finiteModelExists (query : TFF.Problem) (deciseconds : Nat) : MetaM Bool := 
   writeArtifact (vampire.outputPath.get opts) ".fmb.exitcode" s!"{result.exitCode}\n"
   return szsStatus? result.stdout == some "Satisfiable"
 
+/-- The portfolio strategy of the worker that found the proof, in the form
+accepted by `--decode`. Workers announce `% (pid)strategy_time on problem for
+(...)`, and the winner then prints `% (pid) found proof`. -/
+def winningStrategy? (stdout : String) : Option String := do
+  let lines := stdout.splitOn "\n"
+  let found ← lines.find? (·.contains ") found proof")
+  let pid := ((found.drop 3).takeWhile (· != ')')).toString
+  let prefixText := s!"% ({pid})"
+  let announcement ← lines.find? fun line =>
+    line.startsWith prefixText && (line.splitOn " on unknown for (").length > 1
+  let strategy := ((announcement.drop prefixText.length).toString.splitOn " on ").head!
+  if strategy.isEmpty then none else some strategy
+
 /-- Run Vampire on `query` through stdin and parse the TSTP proof from its
 stdout in memory. Concurrent calls therefore never share files.
 
@@ -202,9 +215,9 @@ also written beside it before parsing: when a decoder or reconstruction rule
 fails, the exact proof certificate remains available for inspection and for
 creating a deterministic mock test. `satisfiable` is set when Vampire reports
 `SZS status Satisfiable`. -/
-def invokeVampire (query : TFF.Problem) (satisfiable? : Option (IO.Ref Bool) := none)
+def invokeVampireStrategy (query : TFF.Problem) (satisfiable? : Option (IO.Ref Bool) := none)
     (timeLimitMs? : Option Nat := none) (alternateHO : Bool := false) :
-    MetaM Tptp.Data.TptpFile := do
+    MetaM (Tptp.Data.TptpFile × Option String) := do
   if let some milliseconds := timeLimitMs? then
     if milliseconds < 100 then throwError "Vampire proof-search budget exhausted"
   let opts ← getOptions
@@ -269,11 +282,16 @@ def invokeVampire (query : TFF.Problem) (satisfiable? : Option (IO.Ref Bool) := 
     | .ok prepared =>
       let .mk inputs := prepared
       trace[vampire] "Preprocessed Vampire proof into {inputs.length} TSTP items"
-      pure prepared
+      pure (prepared, winningStrategy? result.stdout)
     | .error message =>
       throwError "Could not preprocess Vampire TSTP proof: {message}"
   | .error message =>
     throwError "Could not parse Vampire output: {message}\n{savedOutputHint destination}"
+
+def invokeVampire (query : TFF.Problem) (satisfiable? : Option (IO.Ref Bool) := none)
+    (timeLimitMs? : Option Nat := none) (alternateHO : Bool := false) :
+    MetaM Tptp.Data.TptpFile :=
+  return (← invokeVampireStrategy query satisfiable? timeLimitMs? alternateHO).1
 
 /-- Capture TF0 through the configured shell script after the tactic has
 restored its state. This preserves the mock protocol used by vampire_export. -/

@@ -96,7 +96,13 @@ private def runMonomorphization (facts inhs : Array Auto.Lemma)
       let inhTys ← state.inhTys.filterM fun fact => do
         let proof ← instantiateMVars fact.proof
         pure ((collectFVars {} proof).fvarIds.all context.contains)
-      continuation { state with inhTys }) extend
+      let facts := state.facts.map fun fact =>
+        if mentionsLabelPrefix "ciInstDefEq" fact.deriv then
+          let proof := mkApp3 (mkConst ``FactReporting.additionalFact) fact.type
+            (toExpr (toString fact.deriv)) fact.proof
+          { fact with proof }
+        else fact
+      continuation { state with inhTys, facts }) extend
 
 /-- Recover from an unsupported translation of `lemmas`: retry with
 untranslatable instances of explicit hints omitted as well (a premise list
@@ -159,7 +165,9 @@ def monomorphizeWithOptionalFacts (lemmas inhs : Array Auto.Lemma)
     (continuation : Auto.Reif.State → MetaM α) : MetaM α := do
   let extended ← IO.mkRef false
   let extend facts := do
+    if vampire.onlyFacts.get (← getOptions) then return #[]
     let added := (← DefinitionAlignment.extend facts) ++ (← CoercionNormalization.extend facts)
+    let added := added.map FactReporting.markLemma
     let added ← SourceNormalization.prepareForMonomorphization added
     unless added.isEmpty do extended.set true
     return added

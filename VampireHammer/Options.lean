@@ -7,9 +7,19 @@ configuration interface.
 
 open Lean
 
+register_option vampire.onlyFacts : Bool := {
+  defValue := false
+  descr := "Internal: restrict vampire only to selected source facts"
+}
+
 register_option vampire.quiet : Bool := {
   defValue := true
   descr := "Suppress the success message after vampire closes the goal (errors are still reported)"
+}
+
+register_option vampire.reportFacts : Bool := {
+  defValue := true
+  descr := "Report automatically added premises used by the completed proof"
 }
 
 register_option vampire.cache : Bool := {

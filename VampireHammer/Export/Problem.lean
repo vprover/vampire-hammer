@@ -134,13 +134,14 @@ where
     let facts ← dropUnsupportedTypeclassLaws facts
     -- The ordinary path keeps Auto's full inductive theory. The fallback adds
     -- checked structure projections at source constructor applications.
-    let inds ← if encode then pure #[] else Auto.LamReif.reifMutInds inductives
+    let onlyFacts := vampire.onlyFacts.get (← getOptions)
+    let inds ← if encode || onlyFacts then pure #[] else Auto.LamReif.reifMutInds inductives
     let (facts, _) ← Auto.LamReif.preprocess facts inds
     -- lean-auto's checked meaning of the `Bool` constants and of `ite` at each
     -- sort, which both exporters keep as uninterpreted symbols.
     -- `ofProp`'s specification quantifies over propositions, which TF0 cannot;
     -- `ofProp` itself is exported only in THF.
-    let auxiliary ← Auto.LamReif.auxLemmas facts
+    let auxiliary ← if onlyFacts then pure #[] else Auto.LamReif.auxLemmas facts
     let higherOrder := vampire.higherOrder.get (← getOptions)
     let facts := facts ++ auxiliary.filter fun fact =>
       higherOrder || !(fact.allLamTerms.any fun term => quantifiesProp term)

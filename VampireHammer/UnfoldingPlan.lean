@@ -1,5 +1,6 @@
 import Auto.Tactic
 import VampireHammer.SourceNormalization
+import VampireHammer.FactReporting
 
 /-! A problem-level decision of which definitions to unfold.
 
@@ -295,7 +296,8 @@ def applyToLemmas (planned : Array Name) (lemmas : Array Auto.Lemma) :
     trace[vampire.unfold] "Planned unfolding of {lemma.deriv}: {type}"
     if ← isTautology type then return none
     -- Expansions can bind subtype elements (`Set.range` of a function on `↥s`).
-    return some (← SubtypeRelativization.relativize { lemma with type })
+    let proof := FactReporting.markUnfolded planned type lemma.proof
+    return some (← SubtypeRelativization.relativize { lemma with type, proof })
 
 /-- After monomorphization, instantiation creates applications of definitions
 that the generic facts did not show (`s ≤ t` of an arbitrary order becomes
@@ -315,7 +317,7 @@ def expandInstantiated (facts : Array Auto.Lemma) (requested : Array Name) :
       continue
     let label := s!"unfolding plan {planned.toList} in {fact.deriv}"
     copies := copies.push (← SubtypeRelativization.relativize
-      ⟨⟨← mkExpectedTypeHint fact.proof type, type, .leaf (label.take 300).toString⟩, #[]⟩)
+      ⟨⟨FactReporting.markUnfolded planned type (← mkExpectedTypeHint fact.proof type), type, .leaf (label.take 300).toString⟩, #[]⟩)
   trace[vampire.unfold] "Expanded {copies.size} instantiated facts with {planned}"
   return copies
 

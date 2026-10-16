@@ -1,4 +1,5 @@
 import Auto.Tactic
+import VampireHammer.Options
 import VampireHammer.Export.StructureProjections
 import VampireHammer.Export.Inhabitation
 
@@ -56,6 +57,7 @@ private def objectSort (sort : LamSort) : EncodeM LamSort := do
         pure (some (.lam `argument domainType (mkConst ``True) .default))
       else if let some (witness, _, _) := (← Auto.LamReif.getInhabitations)[range]? then
         pure (some (.lam `argument domainType witness .default))
+      else if vampire.onlyFacts.get (← getOptions) then pure none
       else Auto.Meta.trySynthInhabited type
     else pure none
   if let some witness := witness? then
@@ -254,6 +256,7 @@ They use the same function objects as explicit source projections, so congruence
 can connect two constructor values without assuming an unverified datatype theory. -/
 private partial def constructorDefinitions (sort : LamSort) (term : LamTerm)
     (bound : List LamSort) (encoded : LamTerm) : EncodeM Unit := do
+  if vampire.onlyFacts.get (← getOptions) then return
   unless sort.isAtom do return
   let bound := if term.maxLooseBVarSucc == 0 then [] else bound
   let key := (term, bound)

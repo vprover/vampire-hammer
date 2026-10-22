@@ -5,7 +5,7 @@
 | lean-auto | Translation fork at `https://github.com/i-am-a-teapot/lean-auto` |
 | VampLean | `https://github.com/vprover/vamplean` |
 | TPTP parser | Bundled in [tptp_parser/](tptp_parser/README.md) |
-| Vampire | Certificate-emitting commit `6ee1f120df1b6c38705066dcbe7c858c09b12ded` from `https://github.com/vprover/vampire` (`tptp-replay-annotations` branch) |
+| Vampire | Certificate-emitting commit `f88321acd46b9c64c752b800d0adc55441371c4e` from `https://github.com/vprover/vampire` (built with `-DVIRAS=OFF`) |
 
 Lean and dependency revisions are recorded in [lean-toolchain](../lean-toolchain),
 [lakefile.lean](../lakefile.lean) and [lake-manifest.json](../lake-manifest.json).

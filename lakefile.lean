@@ -38,8 +38,8 @@ lean_exe «vampire-preprocess» where
   root := `VampireHammer.CLI
 
 /-- Pinned Vampire commit with the replay and higher-order certificates
-this package consumes, from the `tptp-replay-annotations` branch. -/
-def vampireRevision : String := "6ee1f120df1b6c38705066dcbe7c858c09b12ded"
+this package consumes, in which VIRAS is a compile-time option. -/
+def vampireRevision : String := "f88321acd46b9c64c752b800d0adc55441371c4e"
 
 def vampireRepository : String :=
   (get_config? vampireRepository).getD "https://github.com/vprover/vampire"
@@ -76,8 +76,8 @@ private def gitOutput (repository : FilePath) (args : Array String) : LogIO Stri
   return output.trimAscii.toString
 
 /-- Fetch the pinned Vampire commit (shallow; CMake fetches the `cadical`
-and `viras` submodules it needs) and build a Release binary. The build is
-redone when the pinned commit or linking mode changes. -/
+submodule it needs; VIRAS is disabled, so it is neither downloaded nor compiled)
+and build a Release binary. The build is redone when the pinned commit or linking mode changes. -/
 target vampire pkg : FilePath := Job.async do
   let root := pkg.lakeDir / "vampire"
   let source := root / "source"
@@ -106,7 +106,7 @@ target vampire pkg : FilePath := Job.async do
   let jobs ← vampireJobs
   logInfo s!"building Vampire {wanted} with {jobs} parallel jobs"
   proc { cmd := "cmake", args := #["-S", source.toString, "-B", build.toString,
-    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_BUILD_TYPE=Release", "-DVIRAS=OFF",
     if vampireStatic then "-DBUILD_SHARED_LIBS=OFF" else "-DBUILD_SHARED_LIBS=ON",
     "-DTHREADS_PREFER_PTHREAD_FLAG=ON"] }
   proc { cmd := "cmake", args := #["--build", build.toString, "--target", "vampire",

@@ -280,8 +280,8 @@ available memory, with at least one job. On macOS the memory estimate uses
 half the total memory. If memory cannot be determined, the core count is
 used. The core-count fallback is 1.
 
-Vampire is pinned to commit `6ee1f120df1b6c38705066dcbe7c858c09b12ded`
-from the `tptp-replay-annotations` branch. The `vampireRevision` constant in
+Vampire is pinned to commit `f88321acd46b9c64c752b800d0adc55441371c4e`
+(built with `-DVIRAS=OFF`, so VIRAS is neither downloaded nor compiled). The `vampireRevision` constant in
 `lakefile.lean` records the pin; it is not a `-K` setting. Fresh builds fetch
 that commit directly, and existing checkouts at another commit are switched
 to the pin without forcing local changes. Deleting `.lake/vampire` rebuilds

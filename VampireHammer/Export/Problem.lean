@@ -105,7 +105,7 @@ used for unsupported function/proposition values, before any prover process
 is started. Both reification states and Lean's metavariable state are restored
 before retrying, so a failed translation cannot leave stale symbols behind. -/
 def prepareFirstOrderProblem (sources inhs : Array Auto.UMonoFact)
-    (inductives : Array (Array Auto.SimpleIndVal)) :
+    (inductives : Array Auto.SimpleMutIndVal) :
     Auto.LamReif.ReifM (TFF.Problem × Array Auto.Embedding.Lam.REntry) := do
   let savedLam ← get
   let savedReif ← liftM (show Auto.Reif.ReifM Auto.Reif.State from get)
@@ -136,7 +136,7 @@ where
     -- checked structure projections at source constructor applications.
     let onlyFacts := vampire.onlyFacts.get (← getOptions)
     let inds ← if encode || onlyFacts then pure #[] else Auto.LamReif.reifMutInds inductives
-    let (facts, _) ← Auto.LamReif.preprocess facts inds
+    let (facts, _) ← Auto.LamReif.preprocess facts (inds.map (·.info))
     -- lean-auto's checked meaning of the `Bool` constants and of `ite` at each
     -- sort, which both exporters keep as uninterpreted symbols.
     -- `ofProp`'s specification quantifies over propositions, which TF0 cannot;

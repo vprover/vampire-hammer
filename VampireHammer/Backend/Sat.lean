@@ -299,8 +299,7 @@ private def avatarLratBooleanProof (input : RuleInput) (atoms : Array Expr)
     clauseExprs := clauseExprs.push cursor.appFn!.appArg!
     cursor := cursor.appArg!
     tailExprs := tailExprs.push cursor
-  let clauseArray ← mkAppM ``List.toArray #[dataExpr]
-  let cnf ← mkAppM ``Std.Sat.CNF.mk #[clauseArray]
+  let cnf := mkApp (mkConst ``SatCertificate.toCNF) dataExpr
   let check := mkApp2 (mkConst ``Std.Tactic.BVDecide.Reflect.verifyCert) cnf certificate
   let .success checked ← nativeEqTrue `vampire_sat check | do
     return none

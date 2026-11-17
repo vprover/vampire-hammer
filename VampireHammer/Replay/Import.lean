@@ -80,8 +80,18 @@ def importLocalProof (problem : TFF.Problem) (localProof : LocalProof)
     -- descriptions.  Once the temporary local context has gone away, those
     -- descriptions tell lean-auto's checker exactly what the returned Lean
     -- expression proves.
-    let (inhabitantSorts, sourceTerms, lemmas, inhabitantLemmas) ←
-      Auto.Lam2DAAF.withAll nonemptiesWithDTr validsWithDTr
+    let inhabitantSortsWithDTr ← nonemptiesWithDTr.mapM fun (entry, derivation) => do
+      match entry with
+      | .nonempty sort => pure (sort, derivation)
+      | _ => throwError "Vampire replay expected a nonempty entry, got {entry}"
+    let sourceTermsWithDTr ← validsWithDTr.mapM fun (entry, derivation) => do
+      match entry with
+      | .valid [] term => pure (term, derivation)
+      | _ => throwError "Vampire replay expected a closed valid entry, got {entry}"
+    let inhabitantSorts := inhabitantSortsWithDTr.map Prod.fst
+    let sourceTerms := sourceTermsWithDTr.map Prod.fst
+    let (lemmas, inhabitantLemmas) ←
+      Auto.Lam2DAAF.withAll inhabitantSortsWithDTr sourceTermsWithDTr
 
     unless lemmas.size == localProof.factIndices.size do
       throwError "internal error: TFF fact map does not match lean-auto's preprocessed facts"

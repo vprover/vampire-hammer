@@ -1,54 +1,105 @@
 import VampireHammer
+import Mathlib.Order.Defs.PartialOrder
 
-/-!
-Central squares imply central commutators, using only Lean and VampireHammer.
-The group operations, group laws, and commutation predicate are defined here.
--/
+namespace MinimalExamples
 
-namespace CentralSquaresExample
+inductive Logic4 where
+  | low
+  | high
+  | x
+  | z
+deriving DecidableEq
 
-/-- A group, with its operations and both identity and inverse laws explicit. -/
-class Group (G : Type u) extends Mul G, Inv G, OfNat G 1 where
-  mul_assoc (a b c : G) : (a * b) * c = a * (b * c)
-  one_mul (a : G) : 1 * a = a
-  mul_one (a : G) : a * 1 = a
-  inv_mul_cancel (a : G) : a⁻¹ * a = 1
-  mul_inv_cancel (a : G) : a * a⁻¹ = 1
+namespace Logic4
 
-export Group (mul_assoc one_mul mul_one inv_mul_cancel mul_inv_cancel)
+abbrev IsTrue (a : Logic4) : Prop := a = .high
 
-/-- Two elements commute when reversing their product leaves it unchanged. -/
-def Commute {G : Type u} [Mul G] (a b : G) : Prop := a * b = b * a
+def and (a : Logic4) (b : Logic4) : Logic4 :=
+  match a, b with
+    | .low, _ => .low
+    | _, .low => .low
+    | .high, b' => b'
+    | a', .high => a'
+    | _, _ => .x
 
-variable {G : Type u} [Group G]
+def not (a : Logic4) : Logic4 :=
+  match a with
+    | .low => .high
+    | .high => .low
+    | _ => .x
 
-theorem mul_inv_cancel_left (a b : G) : a * (a⁻¹ * b) = b := by
-  rw [← mul_assoc, mul_inv_cancel, one_mul]
+def or (a : Logic4) (b : Logic4) : Logic4 :=
+  match a, b with
+    | .high, _ => .high
+    | _, .high => .high
+    | .low, b' => b'
+    | a', .low => a'
+    | _, _ => .x
 
-/-- A product of two elements commuting with `c` also commutes with `c`. -/
-theorem Commute.mul_left {a b c : G} (ha : Commute a c) (hb : Commute b c) :
-    Commute (a * b) c := by
-  change (a * b) * c = c * (a * b)
-  change a * c = c * a at ha
-  change b * c = c * b at hb
-  rw [mul_assoc, hb, ← mul_assoc a c b, ha, mul_assoc]
+def impl (a : Logic4) (b : Logic4) : Logic4 :=
+  Logic4.or a.not b
 
-theorem centralSquares_manual
-    (h : ∀ x y : G, Commute (x * x) y) (a b c : G) :
-    Commute (a * b * a⁻¹ * b⁻¹) c := by
-  have factor : a * b * a⁻¹ * b⁻¹ =
-      (a * a) * ((a⁻¹ * b) * (a⁻¹ * b)) * (b⁻¹ * b⁻¹) := by
-    simp only [mul_assoc, mul_inv_cancel_left]
-  rw [factor]
-  exact ((h a c).mul_left (h (a⁻¹ * b) c)).mul_left (h b⁻¹ c)
+def xor (a : Logic4) (b : Logic4) : Logic4 :=
+  match a, b with
+    | .high, .high => .low
+    | .low, .low => .low
+    | .high, .low => .high
+    | .low, .high => .high
+    | _, _ => .x
 
+def xnor (a : Logic4) (b : Logic4) : Logic4 :=
+  match a, b with
+    | .high, .high => .high
+    | .low, .low => .high
+    | .high, .low => .low
+    | .low, .high => .low
+    | _, _ => .x
 
-theorem centralSquares
-    (h : ∀ x y : G, Commute (x * x) y) (a b c : G) :
-    Commute (a * b * a⁻¹ * b⁻¹) c := by
-  vampire
+theorem xnor_eq_neg_xor (a : Logic4) (b : Logic4) : a.xnor b = (a.xor b).not := by
+  vampire [xnor.eq_1, xnor.eq_2, xnor.eq_3, xnor.eq_4, xnor.eq_5,
+    xor.eq_1, xor.eq_2, xor.eq_3, xor.eq_4, xor.eq_5,
+    not.eq_1, not.eq_2, not.eq_3]
 
-#print axioms centralSquares_manual
-#print axioms centralSquares
+/-- Constructor distinctness does not by itself tell Vampire that these are all the values. -/
+lemma eq_low_or_high_or_x_or_z (a : Logic4) :
+    a = low ∨ a = high ∨ a = x ∨ a = z := by
+  cases a <;> vampire
 
-end CentralSquaresExample
+lemma double_neg_elim (a : Logic4) (h : a ≠ .z) : a.not.not = a := by
+  vampire [h, eq_low_or_high_or_x_or_z, not.eq_1, not.eq_2, not.eq_3]
+
+lemma de_morgan (a : Logic4) (b : Logic4) : (Logic4.and a b).not = (Logic4.or a.not b.not) := by
+  vampire [and.eq_1, and.eq_2, and.eq_3, and.eq_4, and.eq_5,
+    or.eq_1, or.eq_2, or.eq_3, or.eq_4, or.eq_5,
+    not.eq_1, not.eq_2, not.eq_3, eq_low_or_high_or_x_or_z]
+
+lemma de_morgen_rev (a : Logic4) (b : Logic4) : (Logic4.or a b).not = (Logic4.and a.not b.not) := by
+  vampire [and.eq_1, and.eq_2, and.eq_3, and.eq_4, and.eq_5,
+    or.eq_1, or.eq_2, or.eq_3, or.eq_4, or.eq_5,
+    not.eq_1, not.eq_2, not.eq_3, eq_low_or_high_or_x_or_z]
+
+instance : LE Logic4 where
+  le a b := a = b ∨ a = low ∨ b = high
+
+instance (a b : Logic4) : Decidable (a ≤ b) :=
+  inferInstanceAs (Decidable (a = b ∨ a = low ∨ b = high))
+
+instance : PartialOrder Logic4 where
+  le_refl a := by vampire [*]
+  le_trans a b c := by vampire [*]
+  le_antisymm a b := by vampire [*]
+
+instance (a b : Logic4) : Decidable (a < b) :=
+  inferInstanceAs (Decidable (a ≤ b ∧ ¬ b ≤ a))
+
+instance : Zero Logic4 := ⟨low⟩
+instance : One Logic4 := ⟨high⟩
+
+theorem zero_lt_x : (0 : Logic4) < x := by vampire
+theorem zero_lt_z : (0 : Logic4) < z := by vampire
+theorem x_lt_one : x < (1 : Logic4) := by vampire
+theorem z_lt_one : z < (1 : Logic4) := by vampire
+
+end Logic4
+
+end MinimalExamples

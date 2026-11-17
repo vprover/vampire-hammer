@@ -12,10 +12,10 @@ open VampireHammer.SatCertificate Std.Tactic.BVDecide
     | throw <| IO.userError "failed to order valid RUP hints"
   unless actions == #[.addEmpty 4 #[2, 3, 1]] do
     throw <| IO.userError s!"unexpected ordered hints: {repr actions}"
-  let cnf : Std.Sat.CNF Nat := ⟨boundary.map (·.2.toList)⟩
+  let cnf : Std.Sat.CNF Nat := toCNF (boundary.toList.map (·.2.toList))
   unless LRAT.check actions cnf do
     throw <| IO.userError "standard checker rejected a valid compiled certificate"
-  let satisfiable : Std.Sat.CNF Nat := ⟨#[boundary[0]!.2.toList, boundary[1]!.2.toList]⟩
+  let satisfiable : Std.Sat.CNF Nat := toCNF [boundary[0]!.2.toList, boundary[1]!.2.toList]
   if LRAT.check actions satisfiable then
     throw <| IO.userError "checker accepted a certificate for a changed, satisfiable CNF"
   let conversion : Array RupStep := #[
@@ -38,27 +38,27 @@ open VampireHammer.SatCertificate Std.Tactic.BVDecide
 -- Kernel checks for the CNF-to-Boolean bridge, independent of certificate compilation.
 example (assign : Nat → Bool) (c : List Literal) (cs : List (List Literal))
     (head : clauseValue assign c = true)
-    (tail : cs.all (Std.Sat.CNF.Clause.eval assign) = true) :
-    (c :: cs).all (Std.Sat.CNF.Clause.eval assign) = true :=
+    (tail : cs.all (clauseEval assign) = true) :
+    (c :: cs).all (clauseEval assign) = true :=
   satCons assign c cs head tail
 
 example (assign : Nat → Bool) :
     clauseValue assign [(0, true), (1, false)] =
-      Std.Sat.CNF.Clause.eval assign [(0, true), (1, false)] :=
+      clauseEval assign [(0, true), (1, false)] :=
   clauseValue_eq_eval assign _
 
 -- Exercise native checking together with the proved bridge. The resulting
 -- contradiction applies to any assignment, not to a chosen test value.
 example (assign : Nat → Bool)
     (satisfied : [[(0, true)], [(0, false)]].all
-      (Std.Sat.CNF.Clause.eval assign) = true) : False :=
+      (clauseEval assign) = true) : False :=
   refute [[(0, true)], [(0, false)]] #[.addEmpty 3 #[1, 2]] (by native_decide) assign satisfied
 
 -- The same refutation with the hints in LRAT text form, as the handler emits
 -- them; the serialization round-trips through the standard parser.
 example (assign : Nat → Bool)
     (satisfied : [[(0, true)], [(0, false)]].all
-      (Std.Sat.CNF.Clause.eval assign) = true) : False :=
+      (clauseEval assign) = true) : False :=
   refuteCert [[(0, true)], [(0, false)]]
     (Std.Tactic.BVDecide.LRAT.lratProofToString #[.addEmpty 3 #[1, 2]])
     (by native_decide) assign satisfied

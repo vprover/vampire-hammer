@@ -14,7 +14,7 @@ elab "check_inductive_lets" : command => liftTermElabM do
   for (expression, expected) in #[(simple, #[``Nat]), (nested, #[``Nat, ``Bool])] do
     let collected ← Auto.collectExprsSimpleInduct #[expression]
     for name in expected do
-      unless collected.any (·.any (·.name == name)) do
+      unless collected.any (·.vals.any (·.name == name)) do
         throwError "collector missed {name} beneath a let"
 
 check_inductive_lets
@@ -30,7 +30,7 @@ elab "check_inductive_projections" : command => liftTermElabM do
     let nested := Expr.letE `pair pairType pair (.proj ``Prod 1 (.bvar 0)) false
     for expression in #[projection, metadata, nested] do
       let collected ← Auto.collectExprsSimpleInduct #[expression]
-      unless collected.any (·.any (·.name == ``Nat)) do
+      unless collected.any (·.vals.any (·.name == ``Nat)) do
         throwError "collector missed the projection's Nat parameter"
 
 check_inductive_projections

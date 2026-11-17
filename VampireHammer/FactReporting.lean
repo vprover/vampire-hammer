@@ -92,7 +92,7 @@ def report (goal : MVarId) (hints : TSyntax ``Auto.hints) : TacticM Unit := goal
   unless facts.isEmpty do
     let requested := match hints.raw[0] with
       | .node _ _ args => if args.size == 3 then
-          (args[1]!.getSepArgs.toList.map fun hint => (hint.reprint.getD "").trim)
+          (args[1]!.getSepArgs.toList.map fun hint => (hint.reprint.getD "").trimAscii.toString)
         else ["*"] -- an omitted list means all local hypotheses in `vampire`
       | _ => []
     -- Direct proofs leave neither marker; a parallel race records the winner.

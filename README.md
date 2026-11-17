@@ -7,7 +7,7 @@ route.
 
 ## Installation
 
-Use Lean 4.34.1 and add this to your `lakefile.lean`:
+Use Lean 4.35.0 and add this to your `lakefile.lean`:
 
 ```lean
 require vampire_hammer from git "https://github.com/vprover/vampire-hammer" @ "main"

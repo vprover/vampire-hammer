@@ -12,7 +12,7 @@ package vampire_hammer where
   extraDepTargets := #[`vampire]
 
 require auto from git "https://github.com/i-am-a-teapot/lean-auto" @
-  "a2f825aca7e56ac2f6b3b502bc1290369fc6d5f5"
+  "1fefc577fdd613aea04de629936d0295bf987fe0"
 
 require vamplean from git "https://github.com/vprover/vamplean" @
   "fda0586b716ae9844bb33cbe0d2053730afcc16b"
@@ -20,7 +20,7 @@ require vamplean from git "https://github.com/vprover/vamplean" @
 require tptp_parser from "vendor/tptp_parser"
 
 meta if get_config? mathlib == some "true" then
-  require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.34.1"
+  require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.35.0"
 
 @[default_target]
 lean_lib VampireHammer where

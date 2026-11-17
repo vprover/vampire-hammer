@@ -95,29 +95,40 @@ def Assignment.get : Assignment → Nat → Bool
 def clauseValue (assign : Nat → Bool) (clause : List Literal) : Bool :=
   clause.foldr (fun lit rest => cond lit.2 (assign lit.1) (!assign lit.1) || rest) false
 
+/-- Convert list literals to the packed clause representation used by Std. -/
+def clauseEval (assign : Nat → Bool) (clause : List Literal) : Bool :=
+  CNF.Clause.eval assign (CNF.Clause.ofLiterals clause)
+
+/-- Preserve boundary clause order when constructing the checked CNF. -/
+def toCNF (clauses : List (List Literal)) : CNF Nat :=
+  ⟨(clauses.map CNF.Clause.ofLiterals).toArray⟩
+
 theorem clauseValue_eq_eval (assign : Nat → Bool) (clause : List Literal) :
-    clauseValue assign clause = CNF.Clause.eval assign clause := by
+    clauseValue assign clause = clauseEval assign clause := by
+  unfold clauseEval CNF.Clause.eval
+  rw [CNF.Clause.literals_ofLiterals]
   induction clause with
   | nil => rfl
   | cons lit tail ih =>
     rcases lit with ⟨atom, positive⟩
-    simp only [clauseValue, List.foldr_cons, CNF.Clause.eval_cons] at ih ⊢
+    simp only [clauseValue, List.foldr_cons, List.any_cons] at ih ⊢
     rw [ih]
     cases positive <;> cases assign atom <;> rfl
 
 theorem satCons (assign : Nat → Bool) (clause : List Literal) (tail : List (List Literal))
     (head : clauseValue assign clause = true)
-    (rest : tail.all (CNF.Clause.eval assign) = true) :
-    (clause :: tail).all (CNF.Clause.eval assign) = true := by
+    (rest : tail.all (clauseEval assign) = true) :
+    (clause :: tail).all (clauseEval assign) = true := by
   rw [List.all_cons, ← clauseValue_eq_eval, head, rest]
   rfl
 
 theorem refute (clauses : List (List Literal)) (actions : Array LRAT.IntAction)
-    (checked : LRAT.check actions ⟨clauses.toArray⟩ = true) (assign : Nat → Bool)
-    (satisfied : clauses.all (CNF.Clause.eval assign) = true) : False := by
-  have unsat := LRAT.check_sound actions ⟨clauses.toArray⟩ checked assign
-  have sat : (CNF.mk clauses.toArray).eval assign = true := by
-    simpa only [CNF.eval, List.all_toArray] using satisfied
+    (checked : LRAT.check actions (toCNF clauses) = true) (assign : Nat → Bool)
+    (satisfied : clauses.all (clauseEval assign) = true) : False := by
+  have unsat := LRAT.check_sound actions (toCNF clauses) checked assign
+  have sat : (toCNF clauses).eval assign = true := by
+    change clauses.all (fun c => CNF.Clause.eval assign (CNF.Clause.ofLiterals c)) = true at satisfied
+    simpa only [toCNF, CNF.eval, List.all_toArray, List.all_map, Function.comp_def] using satisfied
   rw [sat] at unsat
   contradiction
 
@@ -126,11 +137,12 @@ native check then only embeds one string literal for the hints, which the
 compiler handles far faster than the equivalent constructor terms; the
 already-compiled standard parser decodes it. -/
 theorem refuteCert (clauses : List (List Literal)) (certificate : String)
-    (checked : Reflect.verifyCert ⟨clauses.toArray⟩ certificate = true) (assign : Nat → Bool)
-    (satisfied : clauses.all (CNF.Clause.eval assign) = true) : False := by
-  have unsat := Reflect.verifyCert_correct ⟨clauses.toArray⟩ certificate checked assign
-  have sat : (CNF.mk clauses.toArray).eval assign = true := by
-    simpa only [CNF.eval, List.all_toArray] using satisfied
+    (checked : Reflect.verifyCert (toCNF clauses) certificate = true) (assign : Nat → Bool)
+    (satisfied : clauses.all (clauseEval assign) = true) : False := by
+  have unsat := Reflect.verifyCert_correct (toCNF clauses) certificate checked assign
+  have sat : (toCNF clauses).eval assign = true := by
+    change clauses.all (fun c => CNF.Clause.eval assign (CNF.Clause.ofLiterals c)) = true at satisfied
+    simpa only [toCNF, CNF.eval, List.all_toArray, List.all_map, Function.comp_def] using satisfied
   rw [sat] at unsat
   contradiction
 

@@ -395,7 +395,7 @@ lake -R -KvampireJobs=4 build vampire
 | Setting | Default | Effect |
 | --- | --- | --- |
 | `buildVampire` | `true` | Build the bundled prover. Only the string `false` disables the target's clone/build work. |
-| `mathlib` | `false` | The string `true` includes mathlib at `v4.34.1` and enables the Mathlib benchmark library. The test runner sets this for Mathlib tests. |
+| `mathlib` | `false` | The string `true` includes mathlib at `v4.35.0` and enables the Mathlib benchmark library. The test runner sets this for Mathlib tests. |
 | `vampireRepository` | `"https://github.com/vprover/vampire"` | Repository from which the pinned Vampire commit is fetched. |
 | `vampireStatic` | `false` | The string `true` selects static linking (`BUILD_SHARED_LIBS=OFF`); other values select dynamic linking. |
 | `vampireJobs` | Automatic | Maximum parallel build jobs. A parsed natural number is clamped to at least 1; missing or invalid values use the automatic calculation. |

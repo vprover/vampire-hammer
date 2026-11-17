@@ -13,7 +13,8 @@ theorem exampleRefutation {α : Sort u} {P Q : α → Prop} {a : α}
 
 /-- Construct a proof from the callback premises, independently of their names
 and order. This is a bridge smoke test, not a Vampire certificate checker. -/
-def exampleBackend (lemmas : Array Auto.Lemma) (_inhs : Array Auto.Lemma) : MetaM Expr := do
+def exampleBackend (facts : Auto.NativeInterface Auto.Lemma) : MetaM Expr := do
+  let lemmas := facts.valids
   for step in lemmas do
     for premise in lemmas do
       for negative in lemmas do

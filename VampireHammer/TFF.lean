@@ -1,5 +1,5 @@
 import Auto.Translation.LamUtils
-import Auto.Embedding.LamBVarOp
+import Auto.EmbedLam.LamBVarOp
 
 namespace VampireHammer.TFF
 
